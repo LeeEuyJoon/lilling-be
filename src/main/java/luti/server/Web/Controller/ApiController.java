@@ -1,4 +1,4 @@
-package luti.server.Web;
+package luti.server.Web.Controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

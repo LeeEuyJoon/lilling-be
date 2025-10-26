@@ -1,6 +1,5 @@
-package luti.server.Web;
+package luti.server.Web.Controller;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

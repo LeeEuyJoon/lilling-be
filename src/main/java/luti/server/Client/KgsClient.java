@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import luti.server.Web.Dto.KeyBlock;
+import luti.server.Client.dto.KeyBlock;
 
 @Component
 public class KgsClient {

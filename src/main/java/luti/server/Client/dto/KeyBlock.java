@@ -1,4 +1,4 @@
-package luti.server.Web.Dto;
+package luti.server.Client.dto;
 
 public class KeyBlock {
 
