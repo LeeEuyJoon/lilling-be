@@ -8,4 +8,5 @@ import luti.server.Entity.UrlMapping;
 @Repository
 public interface UrlMappingRepository extends JpaRepository<UrlMapping, Long> {
 
+	UrlMapping findByShortUrl(String s);
 }

@@ -8,7 +8,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
 @Entity
@@ -18,13 +17,13 @@ public class UrlMapping {
 	// 필드
 
 	@Id
-	@GeneratedValue
-	private Long id;
+	@Column(name = "scrambled_id", nullable = false, updatable = false)
+	private Long scrambledId;
 
+	@Column(name = "original_url", nullable = false, updatable = false, length = 2048)
 	private String originalUrl;
 
-	private Long scrambleId;
-
+	@Column(name = "short_url", nullable = false, updatable = false, length = 512)
 	private String shortUrl;
 
 	@CreatedDate
@@ -33,16 +32,12 @@ public class UrlMapping {
 
 	// Getter 메서드
 
-	public Long getId() {
-		return id;
-	}
-
 	public String getOriginalUrl() {
 		return originalUrl;
 	}
 
-	public Long getScrambleId() {
-		return scrambleId;
+	public Long getScrambledId() {
+		return scrambledId;
 	}
 
 	public String getShortUrl() {
@@ -61,7 +56,7 @@ public class UrlMapping {
 	// Builder용 private 생성자
 	private UrlMapping(Builder builder) {
 		this.originalUrl = builder.originalUrl;
-		this.scrambleId = builder.scrambleId;
+		this.scrambledId = builder.scrambledId;
 		this.shortUrl = builder.shortUrl;
 	}
 
@@ -73,7 +68,7 @@ public class UrlMapping {
 	// 내부 Builder 클래스
 	public static class Builder {
 		private String originalUrl;
-		private Long scrambleId;
+		private Long scrambledId;
 		private String shortUrl;
 
 		public Builder originalUrl(String
@@ -82,9 +77,8 @@ public class UrlMapping {
 			return this;
 		}
 
-		public Builder scrambleId(Long
-			scrambleId) {
-			this.scrambleId = scrambleId;
+		public Builder scrambledId(Long scrambledId) {
+			this.scrambledId = scrambledId;
 			return this;
 		}
 
@@ -96,5 +90,6 @@ public class UrlMapping {
 		public UrlMapping build() {
 			return new UrlMapping(this);
 		}
+
 	}
 }

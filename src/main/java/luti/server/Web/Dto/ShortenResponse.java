@@ -10,4 +10,8 @@ public class ShortenResponse {
 	public String getShortUrl() {
 		return shortUrl;
 	}
+
+	public static ShortenResponse of(String shortUrl) {
+		return new ShortenResponse(shortUrl);
+	}
 }

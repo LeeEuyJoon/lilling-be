@@ -12,7 +12,7 @@ import luti.server.Web.Dto.ShortenRequest;
 import luti.server.Web.Dto.ShortenResponse;
 
 @RestController
-@RequestMapping("/api/url")
+@RequestMapping("/api/v1/url")
 public class ApiController {
 
 	private final ApiFacade apiFacade;
@@ -22,11 +22,9 @@ public class ApiController {
 	}
 
 	@PostMapping("/shorten")
-	public ResponseEntity<ShortenResponse> shortenUrl(@RequestBody @Valid
-	ShortenRequest request) {
+	public ResponseEntity<ShortenResponse> shortenUrl(@RequestBody @Valid ShortenRequest request) {
 
-		return ResponseEntity.ok(
-			new ShortenResponse(apiFacade.shortenUrl(request))
-		);
+		String shortUrl = apiFacade.shortenUrl(request.getOriginalUrl());
+		return ResponseEntity.ok(ShortenResponse.of(shortUrl));
 	}
 }
