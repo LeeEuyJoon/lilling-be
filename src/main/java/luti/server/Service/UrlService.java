@@ -33,9 +33,11 @@ public class UrlService {
 		return urlMapping.getShortUrl();
 	}
 
-	public String getOriginalUrl(String shortCode) {
-		UrlMapping urlMapping = urlMappingRepository.findByShortUrl(DOMAIN + "/" + shortCode);
+	public String getOriginalUrl(Long scrambledId) {
+		UrlMapping urlMapping = urlMappingRepository.findById(scrambledId)
+			.orElseThrow(() -> new RuntimeException("URL not found for scrambledId: " + scrambledId));
 
 		return urlMapping.getOriginalUrl();
 	}
+
 }
