@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 /**
- * ID 스크램블링 및 디스크램블링을 담당하는 서비스 클래스
+ * ID 스크램블링 서비스 클래스
  * 입력값: 0 이상 3,521,614,606,208 미만의 Long 타입의 원본 ID (서비스에서는 1부터 시작하는 연속된 정수 ID)
  * 출력값: String 타입의 스크램블된 ID (3,521,614,606,208 미만의 고유한 정수)
  * 입력값 검증: 입력값이 null이거나 음수인 경우 IllegalArgumentException 예외 발생
