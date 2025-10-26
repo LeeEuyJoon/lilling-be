@@ -125,4 +125,28 @@ class Base62EncoderTest {
 		assertTrue(encoded2.length() <= 7);
 		assertTrue(encoded3.length() <= 7);
 	}
+
+	@Test
+	@DisplayName("Base62 디코딩 정상 동작 테스트")
+	void testDecoding1() {
+		Long number1 = 123456789L;
+		Long number2 = 9876543210L;
+		Long number3 = 3_521_614_606_207L;
+
+		String encoded1 = base62Encoder.encode(number1);
+		String encoded2 = base62Encoder.encode(number2);
+		String encoded3 = base62Encoder.encode(number3);
+
+		Long decoded1 = base62Encoder.decode(encoded1);
+		Long decoded2 = base62Encoder.decode(encoded2);
+		Long decoded3 = base62Encoder.decode(encoded3);
+
+		System.out.println("number1 : " + number1 + ", encoded1 : " + encoded1 + ", decoded1 : " + decoded1);
+		System.out.println("number2 : " + number2 + ", encoded2 : " + encoded2 + ", decoded2 : " + decoded2);
+		System.out.println("number3 : " + number3 + ", encoded3 : " + encoded3 + ", decoded3 : " + decoded3);
+
+		assertEquals(number1, decoded1);
+		assertEquals(number2, decoded2);
+		assertEquals(number3, decoded3);
+	}
 }

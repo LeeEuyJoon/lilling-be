@@ -3,12 +3,7 @@ package luti.server.Service;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-/**
- * Base62 인코딩 서비스 클래스
- * long 타입의 숫자를 Base62 문자열로 변환합니다.
- * 입력값 : 0 이상 3,521,614,606,208 미만의 long 숫자 (IdScrambler의 결과)
- * 출력값 : Base62로 인코딩된 문자열 (7자리 이하)
- */
+
 @Service
 public class Base62Encoder {
 
@@ -44,5 +39,27 @@ public class Base62Encoder {
 
 		// 뒤집어서 리턴
 		return sb.reverse().toString();
+	}
+
+	public Long decode(String encoded) {
+
+		// 입력값 검증
+		Assert.notNull(encoded, "Encoded string must not be null");
+		Assert.isTrue(!encoded.isEmpty(), "Encoded string must not be empty");
+
+		long result = 0;
+
+		// 각 문자를 순회하면서 디코딩
+		for (char c : encoded.toCharArray()) {
+			int index = CHARACTERS.indexOf(c);
+
+			// 유효하지 않은 문자 검증
+			Assert.isTrue(index != -1, "Invalid character in encoded string: " + c);
+
+			// result = result * 62 + index
+			result = result * BASE + index;
+		}
+
+		return result;
 	}
 }
