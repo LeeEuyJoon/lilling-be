@@ -6,7 +6,6 @@ import luti.server.Client.KeyBlockManager;
 import luti.server.Service.Base62Encoder;
 import luti.server.Service.IdScrambler;
 import luti.server.Service.UrlService;
-import luti.server.Web.Dto.ShortenRequest;
 
 @Component
 public class ApiFacade {
