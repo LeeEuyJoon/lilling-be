@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import luti.server.Facade.RedirectFacade;
-import luti.server.Service.UrlService;
 
 @RestController
 @RequestMapping("/")
