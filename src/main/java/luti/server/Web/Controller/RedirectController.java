@@ -24,7 +24,7 @@ public class RedirectController {
 
 	@GetMapping("/{shortCode}")
 	public ResponseEntity<Void>
-	redirect(@PathVariable String shortCode) {
+	redirect(@PathVariable("shortCode") String shortCode) {
 
 		String originalUrl = redirectFacade.getOriginalUrl(shortCode);
 
