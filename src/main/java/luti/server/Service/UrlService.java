@@ -15,17 +15,22 @@ public class UrlService {
 	@Value("${DOMAIN}")
 	private String DOMAIN;
 
+	@Value("${APP_ID}")
+	private String APP_ID;
+
 	public UrlService(UrlMappingRepository urlMappingRepository) {
 		this.urlMappingRepository = urlMappingRepository;
 	}
 
 	@Transactional
-	public String generateShortenedUrl(String originalUrl, Long scrambledId, String encodedValue) {
+	public String generateShortenedUrl(String originalUrl, Long nextId, Long scrambledId, String encodedValue) {
 
 		UrlMapping urlMapping = UrlMapping.builder()
 			.scrambledId(scrambledId)
+			.kgsId(nextId)
 			.originalUrl(originalUrl)
 			.shortUrl(DOMAIN + "/" + encodedValue)
+			.appId(APP_ID)
 			.build();
 
 		urlMappingRepository.save(urlMapping);
@@ -34,8 +39,9 @@ public class UrlService {
 	}
 
 	public String getOriginalUrl(Long scrambledId) {
-		UrlMapping urlMapping = urlMappingRepository.findById(scrambledId)
-			.orElseThrow(() -> new RuntimeException("URL not found for scrambledId: " + scrambledId));
+		UrlMapping urlMapping = urlMappingRepository.findByScrambledId(scrambledId).orElseThrow(() ->
+			new IllegalArgumentException("No URL mapping found for scrambled ID: " + scrambledId)
+		);
 
 		return urlMapping.getOriginalUrl();
 	}

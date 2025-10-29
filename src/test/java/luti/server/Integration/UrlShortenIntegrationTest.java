@@ -42,6 +42,7 @@ class UrlShortenIntegrationTest {
 		registry.add("spring.datasource.username", mysql::getUsername);
 		registry.add("spring.datasource.password", mysql::getPassword);
 		registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+		registry.add("APP_ID", () -> "test-app");
 	}
 
 	@Autowired
@@ -83,14 +84,21 @@ class UrlShortenIntegrationTest {
 
 		UrlMapping saved = urlMappingRepository.findAll().get(0);
 		assertEquals(originalUrl, saved.getOriginalUrl());
-		assertNotNull(saved.getShortUrl());
+		assertNotNull(saved.getId());
+		assertNotNull(saved.getKgsId());
 		assertNotNull(saved.getScrambledId());
+		assertNotNull(saved.getShortUrl());
+		assertNotNull(saved.getAppId());
 		assertNotNull(saved.getCreatedAt());
+		assertEquals("test-app", saved.getAppId());
 
 		System.out.println("=== URL 단축 결과 ===");
+		System.out.println("Auto ID: " + saved.getId());
+		System.out.println("KGS ID: " + saved.getKgsId());
+		System.out.println("Scrambled ID: " + saved.getScrambledId());
 		System.out.println("원본 URL: " + saved.getOriginalUrl());
 		System.out.println("단축 URL: " + saved.getShortUrl());
-		System.out.println("Scrambled ID: " + saved.getScrambledId());
+		System.out.println("App ID: " + saved.getAppId());
 		System.out.println("생성 시각: " + saved.getCreatedAt());
 	}
 
@@ -119,19 +127,35 @@ class UrlShortenIntegrationTest {
 		assertEquals(3, urlMappingRepository.count());
 
 		var urls = urlMappingRepository.findAll();
-		long id1 = urls.get(0).getScrambledId();
-		long id2 = urls.get(1).getScrambledId();
-		long id3 = urls.get(2).getScrambledId();
 
-		// 모두 다른 scrambledId를 가져야 함
-		assertNotEquals(id1, id2);
-		assertNotEquals(id2, id3);
-		assertNotEquals(id1, id3);
+		// Auto-increment ID 검증
+		long autoId1 = urls.get(0).getId();
+		long autoId2 = urls.get(1).getId();
+		long autoId3 = urls.get(2).getId();
+
+		// KGS ID 검증
+		long kgsId1 = urls.get(0).getKgsId();
+		long kgsId2 = urls.get(1).getKgsId();
+		long kgsId3 = urls.get(2).getKgsId();
+
+		// Scrambled ID 검증
+		long scrambledId1 = urls.get(0).getScrambledId();
+		long scrambledId2 = urls.get(1).getScrambledId();
+		long scrambledId3 = urls.get(2).getScrambledId();
+
+		// 모두 다른 ID를 가져야 함
+		assertNotEquals(kgsId1, kgsId2);
+		assertNotEquals(kgsId2, kgsId3);
+		assertNotEquals(kgsId1, kgsId3);
+
+		assertNotEquals(scrambledId1, scrambledId2);
+		assertNotEquals(scrambledId2, scrambledId3);
+		assertNotEquals(scrambledId1, scrambledId3);
 
 		System.out.println("=== 고유 ID 검증 ===");
-		System.out.println("URL1 scrambledId: " + id1);
-		System.out.println("URL2 scrambledId: " + id2);
-		System.out.println("URL3 scrambledId: " + id3);
+		System.out.println("URL1 - Auto ID: " + autoId1 + ", KGS ID: " + kgsId1 + ", Scrambled ID: " + scrambledId1);
+		System.out.println("URL2 - Auto ID: " + autoId2 + ", KGS ID: " + kgsId2 + ", Scrambled ID: " + scrambledId2);
+		System.out.println("URL3 - Auto ID: " + autoId3 + ", KGS ID: " + kgsId3 + ", Scrambled ID: " + scrambledId3);
 	}
 
 	@Test

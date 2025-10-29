@@ -29,7 +29,7 @@ public class ApiFacade {
 		Long scrambledId = idScrambler.scramble(nextId);
 		String encodedValue = base62Encoder.encode(scrambledId);
 		String shortenedUrl =
-			urlService.generateShortenedUrl(originalUrl, scrambledId, encodedValue);
+			urlService.generateShortenedUrl(originalUrl, nextId, scrambledId, encodedValue);
 
 		return shortenedUrl;
 	}
