@@ -1,0 +1,76 @@
+### Lilling Backend API Test
+
+### 환경 변수 설정
+@host = localhost
+@bePort = 8080
+@kgsPort = 8081
+@baseUrl = http://{{host}}:{{bePort}}
+@kgsUrl = http://{{host}}:{{kgsPort}}
+
+### ========== 단축 테스트 ==============
+
+### 1. Google URL 단축
+POST {{baseUrl}}/api/v1/url/shorten
+Content-Type: application/json
+
+{
+  "originalUrl": "https://www.google.com"
+}
+
+### 2. Naver URL 단축
+POST {{baseUrl}}/api/v1/url/shorten
+Content-Type: application/json
+
+{
+  "originalUrl": "https://www.naver.com"
+}
+
+### 3. YouTube URL 단축
+POST {{baseUrl}}/api/v1/url/shorten
+Content-Type: application/json
+
+{
+  "originalUrl": "https://www.youtube.com"
+}
+
+### 4. GitHub URL 단축
+POST {{baseUrl}}/api/v1/url/shorten
+Content-Type: application/json
+
+{
+  "originalUrl": "https://github.com"
+}
+
+### 5. 긴 URL 단축 테스트
+POST {{baseUrl}}/api/v1/url/shorten
+Content-Type: application/json
+
+{
+  "originalUrl": "https://www.example.com/very/long/path/with/many/segments/and/query?param1=value1&param2=value2&param3=value3"
+}
+
+###### ========== 리다이렉트 테스트 ==============
+
+### 6. 단축 + 리다이렉트 통합 테스트
+# Step 1: URL 단축
+POST {{baseUrl}}/api/v1/url/shorten
+Content-Type: application/json
+
+{
+  "originalUrl": "https://www.wikipedia.org"
+}
+
+> {%
+    // 응답에서 shortUrl 추출
+    const shortUrl = response.body.shortUrl;
+    // shortUrl에서 마지막 부분(shortCode)만 추출
+    const shortCode = shortUrl.split('/').pop();
+    // 전역 변수로 저장
+    client.global.set("extractedShortCode", shortCode);
+    console.log("Extracted shortCode: " + shortCode);
+%}
+
+### Step 2: 위에서 추출한 shortCode로 리다이렉트 테스트
+GET {{baseUrl}}/{{extractedShortCode}}
+
+
