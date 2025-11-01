@@ -2,7 +2,7 @@
 
 ### 환경 변수 설정
 @host = localhost
-@bePort = 8080
+@bePort = 80
 @kgsPort = 8081
 @baseUrl = http://{{host}}:{{bePort}}
 @kgsUrl = http://{{host}}:{{kgsPort}}

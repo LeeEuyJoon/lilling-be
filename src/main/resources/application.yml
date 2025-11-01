@@ -17,3 +17,6 @@ spring:
         format_sql: true
     show-sql: true
 
+cors:
+  allowed-origins: ${CROSS_ORIGIN}
+

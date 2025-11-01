@@ -1,6 +1,7 @@
 package luti.server.Web.Controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,7 @@ import luti.server.Web.Dto.ShortenResponse;
 
 @RestController
 @RequestMapping("/api/v1/url")
+@CrossOrigin(origins = "${cors.allowed-origins}")
 public class ApiController {
 
 	private final ApiFacade apiFacade;
