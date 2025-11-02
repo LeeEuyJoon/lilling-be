@@ -26,6 +26,15 @@ public class IdScrambler {
 	@Value("${SCRAMBLING_CONST_B}")
 	private long B;
 
+	@Value("${SCRAMBLING_CONST_XOR1}")
+	private long xorConst1;
+
+	@Value("${SCRAMBLING_CONST_XOR2}")
+	private long xorConst2;
+
+	@Value("${SCRAMBLING_CONST_XOR3}")
+	private long xorConst3;
+
 	private static final long M = 3_521_614_606_208L;
 
 
@@ -38,9 +47,9 @@ public class IdScrambler {
 
 		// 스크램블링 알고리즘 적용
 		Long x= id;
-		x ^= (x << 13);
-		x ^= (x >>> 7);
-		x ^= (x << 17);
+		x ^= (x << xorConst1);
+		x ^= (x >>> xorConst2);
+		x ^= (x << xorConst3);
 
 		Long scrambledId = Math.floorMod(x, M);
 		return scrambledId;
