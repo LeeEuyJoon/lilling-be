@@ -1,6 +1,7 @@
 package luti.server.Service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,7 @@ public class UrlService {
 		return urlMapping.getShortUrl();
 	}
 
+	@Cacheable(value = "urlMapping", key = "#scrambledId")
 	public String getOriginalUrl(Long scrambledId) {
 		UrlMapping urlMapping = urlMappingRepository.findByScrambledId(scrambledId).orElseThrow(() ->
 			new IllegalArgumentException("No URL mapping found for scrambled ID: " + scrambledId)
