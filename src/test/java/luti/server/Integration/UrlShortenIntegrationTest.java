@@ -16,6 +16,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -36,13 +37,22 @@ class UrlShortenIntegrationTest {
 		.withUsername("test")
 		.withPassword("test");
 
+	@Container
+	static GenericContainer<?> redis = new GenericContainer<>("redis:7-alpine")
+		.withExposedPorts(6379);
+
 	@DynamicPropertySource
 	static void configureProperties(DynamicPropertyRegistry registry) {
+		// MySQL 설정
 		registry.add("spring.datasource.url", mysql::getJdbcUrl);
 		registry.add("spring.datasource.username", mysql::getUsername);
 		registry.add("spring.datasource.password", mysql::getPassword);
 		registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
 		registry.add("APP_ID", () -> "test-app");
+
+		// Redis 설정
+		registry.add("spring.data.redis.host", redis::getHost);
+		registry.add("spring.data.redis.port", redis::getFirstMappedPort);
 	}
 
 	@Autowired

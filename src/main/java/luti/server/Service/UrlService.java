@@ -39,7 +39,7 @@ public class UrlService {
 		return urlMapping.getShortUrl();
 	}
 
-	@Cacheable(value = "urlMapping", key = "#scrambledId")
+	@Cacheable(value = "urlMapping", key = "#p0")
 	public String getOriginalUrl(Long scrambledId) {
 		UrlMapping urlMapping = urlMappingRepository.findByScrambledId(scrambledId).orElseThrow(() ->
 			new IllegalArgumentException("No URL mapping found for scrambled ID: " + scrambledId)

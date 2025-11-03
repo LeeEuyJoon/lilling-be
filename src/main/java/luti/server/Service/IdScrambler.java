@@ -15,7 +15,7 @@ import jakarta.annotation.PostConstruct;
  * 입력값 검증: 입력값이 null이거나 음수인 경우 IllegalArgumentException 예외 발생
  * 스크램블링 알고리즘: 선형식 + 모듈러 연산 -> ( A * id + B mod ) M (단, A와 M은 서로소, B는 0 이상 M 미만의 정수) x
  * -> 스크램블링 알고리즘 기존 선형식 기반에서 XORShift 연산으로 변경됨 (모듈러는 적용)
- * 출력값 검증: 0 이상 3,521,614,606,208 이하의 고유한 정수인지 확인 (DB 검증은 생략)
+ * 출력값 검증: 0 이상 3,521,614,606,208 이하의 고유한 정수인지 확인
  */
 @Service
 public class IdScrambler {
