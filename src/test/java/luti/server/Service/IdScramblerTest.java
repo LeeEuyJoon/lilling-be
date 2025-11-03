@@ -14,7 +14,7 @@ class IdScramblerTest {
 	private IdScrambler scrambler;
 
 	@Test
-	@DisplayName("ID 스크램블 테스트 입력값 검증 - null")
+	@DisplayName("IdScrambler 동작 테스트 - 입력값 검증 (null)")
 	void testScramble1() {
 		Long originalId = null;
 
@@ -29,7 +29,7 @@ class IdScramblerTest {
 	}
 
 	@Test
-	@DisplayName("ID 스크램블 테스트 입력값 검증 - 음수")
+	@DisplayName("IdScrambler 동작 테스트 -  입력값 검증 (음수)")
 	void testScramble2() {
 		Long originalId = -123L;
 
@@ -44,7 +44,7 @@ class IdScramblerTest {
 	}
 
 	@Test
-	@DisplayName("ID 스크램블 테스트 입력값 검증 - M 초과")
+	@DisplayName("IdScrambler 동작 테스트 - 입력값 검증 (M 초과)")
 	void testScramble3() {
 		Long originalId = 4_521_614_606_208L;
 
@@ -59,7 +59,7 @@ class IdScramblerTest {
 	}
 
 	@Test
-	@DisplayName("ID 스크램블 테스트 정상 동작 - 작은 수")
+	@DisplayName("IdScrambler 동작 테스트 - 정상 동작 (작은 수)")
 	void testScramble4() {
 		Long originalId1 = 1L;
 		Long originalId2 = 123L;
@@ -85,7 +85,7 @@ class IdScramblerTest {
 	}
 
 	@Test
-	@DisplayName("ID 스크램블 테스트 정상 동작 - 큰 수")
+	@DisplayName("IdScrambler 동작 테스트 - 정상 동작 (큰 수)")
 	void testScramble5() {
 		Long originalId1 = 1_000_000_000L;
 		Long originalId2 = 23_523_050_610L;

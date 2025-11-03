@@ -37,6 +37,16 @@ public class IdScrambler {
 
 	private static final long M = 3_521_614_606_208L;
 
+	// 기본 생성자 -> Spring Container 용
+	public IdScrambler() {}
+
+	// 테스트용 생성자 -> Property Based Testing 용
+	public IdScrambler(long xorConst1, long xorConst2, long xorConst3) {
+		this.xorConst1 = xorConst1;
+		this.xorConst2 = xorConst2;
+		this.xorConst3 = xorConst3;
+	}
+
 
 	// XORShift 기반 스크램블링 알고리즘
 	public Long scramble(Long id) {

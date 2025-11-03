@@ -24,13 +24,13 @@ public class UrlMapping {
 	@Column(name = "kgs_id", nullable = false, updatable = false)
 	private Long kgsId;
 
-	@Column(name = "scrambled_id", nullable = false, updatable = false)
+	@Column(name = "scrambled_id", nullable = false, updatable = false, unique = true)
 	private Long scrambledId;
 
 	@Column(name = "original_url", nullable = false, updatable = false, length = 2048)
 	private String originalUrl;
 
-	@Column(name = "short_url", nullable = false, updatable = false, length = 512)
+	@Column(name = "short_url", nullable = false, updatable = false, length = 512, unique = true)
 	private String shortUrl;
 
 	@Column(name = "app_id", nullable = false, updatable = false)
