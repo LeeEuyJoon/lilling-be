@@ -1,12 +1,8 @@
 package luti.server.Service;
 
-import java.math.BigInteger;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-
-import jakarta.annotation.PostConstruct;
 
 /**
  * ID 스크램블링 서비스 클래스
@@ -35,23 +31,28 @@ public class IdScrambler {
 	/**
 	 * 최대값 M = 62^7 -> 보장 가능한 7자리 이하의 고유한 ID 개수
 	 */
-	private static final long M = 3_521_614_606_208L;
+	private final long M;
 
 	/**
 	 * M의 제곱근 -> 파이스텔 L, R을 나누는 기준 크기
 	 * (전체 공간 M ≈ m × m)
 	 */
-	private static final long m = (long) Math.ceil(Math.sqrt(M));
+	private final long m;
 
 	/**
 	 * 기본 생성자 -> Spring Container 용
 	 */
-	public IdScrambler() {}
+	public IdScrambler() {
+		this.M = 3_521_614_606_208L;
+		this.m = (long) Math.ceil(Math.sqrt(M));
+	}
 
 	/**
 	 * Property Based Testing 용
 	 */
-	public IdScrambler(long xorConst1, long xorConst2, long xorConst3) {
+	public IdScrambler(long M, long xorConst1, long xorConst2, long xorConst3) {
+		this.M = M;
+		this.m = (long) Math.ceil(Math.sqrt(M));
 		this.xorConst1 = xorConst1;
 		this.xorConst2 = xorConst2;
 		this.xorConst3 = xorConst3;
