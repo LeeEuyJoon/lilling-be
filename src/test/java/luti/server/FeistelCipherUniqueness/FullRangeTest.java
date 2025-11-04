@@ -1,4 +1,4 @@
-package luti.server.XORShiftUniqueness;
+package luti.server.FeistelCipherUniqueness;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 
