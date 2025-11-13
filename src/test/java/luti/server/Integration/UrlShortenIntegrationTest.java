@@ -21,10 +21,10 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import luti.server.Client.KgsClient;
-import luti.server.Client.dto.KeyBlock;
-import luti.server.Entity.UrlMapping;
-import luti.server.Repository.UrlMappingRepository;
+import luti.server.client.KgsClient;
+import luti.server.client.dto.KeyBlock;
+import luti.server.entity.UrlMapping;
+import luti.server.repository.UrlMappingRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc

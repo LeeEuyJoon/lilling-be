@@ -7,7 +7,7 @@ import net.jqwik.api.Label;
 import net.jqwik.api.Property;
 import net.jqwik.api.constraints.LongRange;
 
-import luti.server.Service.IdScrambler;
+import luti.server.service.IdScrambler;
 
 public class ReversibilityTest {
 
