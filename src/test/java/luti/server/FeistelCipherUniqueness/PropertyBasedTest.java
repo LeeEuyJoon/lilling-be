@@ -30,13 +30,13 @@ public class PropertyBasedTest {
 		// @Provide Arbitrary<List<Long>> ids_million() { return idListOfSize(1_000_000); }		// ID 100만개 -> 안돌아감 ... ㅋㅋ
 
 		@Property(tries = 10000)
-		@Label("XORShift 고유성 테스트 - 100개 ID 10000번")
+		@Label("Feistel Cipher 고유성 테스트 - 100개 ID 10000번")
 		void testScrambleWith100Ids(@ForAll("ids_hundred") List<Long> ids) {
 			runScrambleTest(ids);
 		}
 
 		@Property(tries = 100)
-		@Label("XORShift 고유성 테스트 - 1만개 ID 100번")
+		@Label("Feistel Cipher 고유성 테스트 - 1만개 ID 100번")
 		void testScrambleWith10000Ids(@ForAll("ids_10_thousand") List<Long> ids) {
 			runScrambleTest(ids);
 		}

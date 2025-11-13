@@ -12,7 +12,7 @@ import luti.server.Service.IdScrambler;
 public class FullRangeTest {
 
 	@Test
-	@DisplayName("XORShift 고유성 증명 - M=1,000,000 전체 범위 테스트")
+	@DisplayName("Feistel Cipher 고유성 증명 - M=1,000,000 전체 범위 테스트")
 	void fullRangeTest() {
 
 		long smallM = 1_000_000L; // 100만

@@ -16,7 +16,7 @@ public class ReversibilityTest {
 	private final IdScrambler scrambler = new IdScrambler(M, 13, 7, 17);
 
 	@Property(tries = 10_000)
-	@Label("XORShift 가역성 테스트 - ID 복원 검증")
+	@Label("Feistel Cipher 가역성 테스트 - ID 복원 검증")
 	void testReversibility(
 		@ForAll @LongRange(min = 0, max = M - 1) long originalId
 	) {
