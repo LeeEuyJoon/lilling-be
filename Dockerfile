@@ -20,7 +20,7 @@ COPY src src
 RUN gradle clean build -x test --no-daemon
 
 # Stage 2: Runtime
-FROM openjdk:17-jdk-slim
+FROM amazoncorretto:17-alpine
 WORKDIR /app
 
 # Copy the built JAR from build stage
