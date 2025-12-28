@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <springProfile name="dev">
+        <include resource="logback-dev.xml"/>
+    </springProfile>
+
+    <springProfile name="deploy">
+        <include resource="logback-deploy.xml"/>
+    </springProfile>
+
+    <springProfile name="default">
+        <include resource="logback-dev.xml"/>
+    </springProfile>
+
+</configuration>
