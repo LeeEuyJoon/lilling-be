@@ -5,8 +5,8 @@
     <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <!-- JSON 포맷 인코더 -->
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <!-- 타임스탬프 UTC 포맷 -->
-            <timeZone>UTC</timeZone>
+            <!-- 타임스탬프 KST 포맷 (Asia/Seoul) -->
+            <timeZone>Asia/Seoul</timeZone>
             <!-- 추가 필드 (선택) -->
             <customFields>{"app":"lilling-be"}</customFields>
         </encoder>
