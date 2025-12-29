@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <!-- JSON 콘솔 출력 (Docker stdout으로 전송) -->
-    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <!-- JSON 포맷 인코더 -->
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <!-- 타임스탬프 KST 포맷 (Asia/Seoul) -->
-            <timeZone>Asia/Seoul</timeZone>
-            <!-- 추가 필드 (선택) -->
-            <customFields>{"app":"lilling-be"}</customFields>
+    <!-- 텍스트 콘솔 출력 (Docker stdout으로 전송) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- 읽기 쉬운 포맷: 타임스탬프 [레벨] [스레드] 로거명 - 메시지 -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%thread] %logger{40} - %msg%n</pattern>
         </encoder>
     </appender>
 
     <!-- 운영에서는 INFO 이상만 -->
     <root level="INFO">
-        <appender-ref ref="JSON_CONSOLE"/>
+        <appender-ref ref="CONSOLE"/>
     </root>
 
     <!-- luti.server 패키지는 INFO -->
