@@ -1,23 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <!-- 텍스트 콘솔 출력 (Docker stdout으로 전송) -->
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <!-- 읽기 쉬운 포맷: 타임스탬프 [레벨] [스레드] 로거명 - 메시지 -->
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%thread] %logger{40} - %msg%n</pattern>
+    <!-- JSON 콘솔 출력 -->
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <!-- timestamp 필드 -->
+                <timestamp>
+                    <timeZone>Asia/Seoul</timeZone>
+                    <fieldName>timestamp</fieldName>
+                    <pattern>yyyy-MM-dd HH:mm:ss</pattern>
+                </timestamp>
+
+                <!-- app 필드 -->
+                <pattern>
+                    <pattern>
+                        {
+                            "app": "lilling-be"
+                        }
+                    </pattern>
+                </pattern>
+
+                <!-- level 필드 -->
+                <logLevel>
+                    <fieldName>level</fieldName>
+                </logLevel>
+
+                <!-- logger_name 필드 -->
+                <loggerName>
+                    <fieldName>logger_name</fieldName>
+                </loggerName>
+
+                <!-- message 필드 -->
+                <message>
+                    <fieldName>message</fieldName>
+                </message>
+
+                <!-- 예외 발생 시 stack_trace-->
+                <stackTrace>
+                    <fieldName>stack_trace</fieldName>
+                </stackTrace>
+            </providers>
         </encoder>
     </appender>
 
-    <!-- 운영에서는 INFO 이상만 -->
+    <!-- 운영에서는 INFO -->
     <root level="INFO">
-        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="JSON_CONSOLE"/>
     </root>
 
     <!-- luti.server 패키지는 INFO -->
     <logger name="luti.server" level="INFO"/>
 
-    <!-- noisy 패키지 줄이기 -->
+    <!-- noisy 패키지 -->
     <logger name="org.hibernate" level="WARN"/>
     <logger name="org.hibernate.SQL" level="OFF"/>
     <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="OFF"/>
