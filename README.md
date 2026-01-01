@@ -49,4 +49,7 @@ Little Linking의 의미를 담고 있는 Lilling 서비스는 URL Shortner 웹 
 
 ---
 
-- 📝 **관련 작성 글** → [고유하면서도 랜덤한 7자리 인코딩을 찾아가는 여정 // Base62, 선형식, XORShift, Feistel Cipher](https://luti-dev.tistory.com/21)
+📝 **관련 작성 글**
+
+- [고유하면서도 랜덤한 7자리 인코딩을 찾아가는 여정 (Base62, 선형식, XORShift, Feistel Cipher)](https://luti-dev.tistory.com/21)
+- [Spring Boot 로깅의 표준 Logback과 SLF4J 알아보기](https://luti-dev.tistory.com/23)
