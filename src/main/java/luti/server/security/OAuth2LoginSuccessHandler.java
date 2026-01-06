@@ -58,7 +58,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 		Object principal = authentication.getPrincipal();
 
 		if (principal instanceof OidcUser oidcUser) {
-			sub = oidcUser.getSubject(); // ✅ OIDC 표준 sub
+			sub = oidcUser.getSubject(); // OIDC 표준 sub
 			email = oidcUser.getEmail(); // null 가능
 		} else if (principal instanceof OAuth2User oAuth2User) {
 			Object subAttr = oAuth2User.getAttributes().get("sub");
