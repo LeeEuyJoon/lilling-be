@@ -116,6 +116,9 @@ public class SecurityConfig {
 				// OAuth2 진입/콜백 경로 (스프링 기본)
 				.requestMatchers("/oauth2/**", "/login/**").permitAll()
 
+				// 로그인 상태 확인 API
+				.requestMatchers("/api/v1/auth/me").permitAll()
+
 				// 나머지는 인증 필요
 				.anyRequest().authenticated()
 			);

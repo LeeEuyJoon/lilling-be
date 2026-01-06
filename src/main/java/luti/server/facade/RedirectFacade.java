@@ -25,15 +25,7 @@ public class RedirectFacade {
 
 		try {
 			Long decodedId = base62Encoder.decode(shortCode);
-			log.debug("Base62 디코딩 완료: shortCode={}, scrambledId={}", shortCode, decodedId);
-
 			String originalUrl = urlService.getOriginalUrl(decodedId);
-
-			if (originalUrl != null) {
-				log.info("리다이렉트 성공: shortCode={}, originalUrl={}", shortCode, originalUrl);
-			} else {
-				log.warn("존재하지 않는 shortCode: {}", shortCode);
-			}
 
 			return originalUrl;
 

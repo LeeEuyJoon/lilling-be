@@ -9,6 +9,7 @@ public enum ErrorCode {
 	 * 2xxx: 리다이렉트 관련 오류
 	 * 3xxx: shortening 관련 오류
 	 * 4xxx: KGS 관련 오류
+	 * 5xxx: 회원 관련 오류
 	 */
 
 	DEFAULT_BUSINESS_ERROR("0000", HttpStatus.BAD_REQUEST, "서버 오류 발생"),
@@ -35,8 +36,9 @@ public enum ErrorCode {
 	KGS_NULL_RESPONSE("4002", HttpStatus.INTERNAL_SERVER_ERROR, "KGS 서버로부터 null 응답을 받았습니다"),
 	KGS_INVALID_RESPONSE("4003", HttpStatus.INTERNAL_SERVER_ERROR, "KGS 서버로부터 유효하지 않은 응답을 받았습니다"),
 	KGS_TIMEOUT("4004", HttpStatus.GATEWAY_TIMEOUT, "KGS 서버 요청 시간이 초과되었습니다"),
-	KGS_UNAVAILABLE("4005", HttpStatus.SERVICE_UNAVAILABLE, "KGS 서비스를 사용할 수 없습니다");
+	KGS_UNAVAILABLE("4005", HttpStatus.SERVICE_UNAVAILABLE, "KGS 서비스를 사용할 수 없습니다"),
 
+	MEMBER_NOT_FOUND("5001", HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다");
 
 
 

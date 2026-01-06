@@ -32,14 +32,8 @@ public class ApiFacade {
 
 		try {
 			Long nextId = keyBlockManager.getNextId();
-			log.debug("KGS ID 획득: kgsId={}", nextId);
-
 			Long scrambledId = idScrambler.scramble(nextId);
-			log.debug("ID 스크램블링 완료: kgsId={}, scrambledId={}", nextId, scrambledId);
-
 			String encodedValue = base62Encoder.encode(scrambledId);
-			log.debug("Base62 인코딩 완료: scrambledId={}, shortCode={}", scrambledId, encodedValue);
-
 			String shortenedUrl =
 				urlService.generateShortenedUrl(originalUrl, nextId, scrambledId, encodedValue);
 
