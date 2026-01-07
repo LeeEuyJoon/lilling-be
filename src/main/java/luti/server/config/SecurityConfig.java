@@ -104,26 +104,13 @@ public class SecurityConfig {
 				.jwt(Customizer.withDefaults())
 			);
 
-		// 인가 룰(필요한 것만 딱 열어두기)
+		// 인가 룰 - 기본은 모두 허용, My URLs 관련만 인증 필요
 		http
 			.authorizeHttpRequests(auth -> auth
-				// 프리플라이트
-				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+				// My URLs 관련 -> 인증 필요
+				.requestMatchers("/api/v1/urls/my-urls/**").authenticated()
 
-				// 헬스체크/루트 등
-				.requestMatchers("/", "/health").permitAll()
-
-				// OAuth2 진입/콜백 경로 (스프링 기본)
-				.requestMatchers("/oauth2/**", "/login/**").permitAll()
-
-				// 로그인 상태 확인 API
-				.requestMatchers("/api/v1/auth/me").permitAll()
-
-				// URL 단축 API 비회원 가능
-				.requestMatchers("/api/v1/url/shorten").permitAll()
-
-				// 나머지는 인증 필요 (나머지가 마이페이지 기능밖에 없을 듯 당장은)
-				.anyRequest().authenticated()
+				.anyRequest().permitAll()
 			);
 
 		return http.build();
