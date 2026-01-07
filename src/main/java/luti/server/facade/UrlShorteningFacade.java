@@ -35,23 +35,17 @@ public class UrlShorteningFacade {
 	public String shortenUrl(String originalUrl, Authentication authentication) {
 		log.info("URL 단축 요청: originalUrl={}", originalUrl);
 
-		try {
+		Member member = authService.getMemberFromAuthentication(authentication);
 
-			Member member = authService.getMemberFromAuthentication(authentication);
+		Long nextId = keyBlockManager.getNextId();
+		Long scrambledId = idScrambler.scramble(nextId);
+		String encodedValue = base62Encoder.encode(scrambledId);
+		String shortenedUrl =
+			urlService.generateShortenedUrl(originalUrl, nextId, scrambledId, encodedValue, member);
 
-			Long nextId = keyBlockManager.getNextId();
-			Long scrambledId = idScrambler.scramble(nextId);
-			String encodedValue = base62Encoder.encode(scrambledId);
-			String shortenedUrl =
-				urlService.generateShortenedUrl(originalUrl, nextId, scrambledId, encodedValue, member);
+		log.info("URL 단축 성공: shortCode={}, kgsId={}, shortenedUrl={}", encodedValue, nextId, shortenedUrl);
+		return shortenedUrl;
 
-			log.info("URL 단축 성공: shortCode={}, kgsId={}, shortenedUrl={}", encodedValue, nextId, shortenedUrl);
-			return shortenedUrl;
-
-		} catch (Exception e) {
-			log.error("URL 단축 실패: originalUrl={}", originalUrl, e);
-			throw e;
-		}
 	}
 
 }

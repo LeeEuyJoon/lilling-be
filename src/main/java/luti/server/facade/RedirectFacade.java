@@ -23,15 +23,9 @@ public class RedirectFacade {
 	public String getOriginalUrl(String shortCode) {
 		log.info("리다이렉트 요청: shortCode={}", shortCode);
 
-		try {
-			Long decodedId = base62Encoder.decode(shortCode);
-			String originalUrl = urlService.getOriginalUrl(decodedId);
+		Long decodedId = base62Encoder.decode(shortCode);
 
-			return originalUrl;
+		return urlService.getOriginalUrl(decodedId);
 
-		} catch (Exception e) {
-			log.error("리다이렉트 실패: shortCode={}", shortCode, e);
-			throw e;
-		}
 	}
 }

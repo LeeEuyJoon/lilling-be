@@ -29,8 +29,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex, WebRequest request) {
 		ErrorCode errorCode = ex.getErrorCode();
 
-		// 비즈니스 예외는 WARN 레벨
-		log.warn("비즈니스 예외 발생: uri={}, errorCode={}, message={}",
+		log.error("비즈니스 예외 발생: uri={}, errorCode={}, message={}",
 			request.getDescription(false), errorCode.name(), errorCode.getMessage());
 
 		ErrorResponse response = ErrorResponse.of(errorCode);
