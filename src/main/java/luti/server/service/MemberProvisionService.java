@@ -31,8 +31,8 @@ public class MemberProvisionService {
 
 		// 신규 가입
 		Member member = new Member(provider, providerSubject, email);
-		memberRepository.save(member);
+		Member savedMember = memberRepository.save(member);
 
-		return new ProvisionedMemberDto(member.getId(), member.getRole());
+		return new ProvisionedMemberDto(savedMember.getId(), member.getRole());
 	}
 }

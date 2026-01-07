@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import luti.server.entity.Member;
 import luti.server.entity.UrlMapping;
 import luti.server.repository.UrlMappingRepository;
 import luti.server.exception.BusinessException;
@@ -31,7 +32,8 @@ public class UrlService {
 	}
 
 	@Transactional
-	public String generateShortenedUrl(String originalUrl, Long nextId, Long scrambledId, String encodedValue) {
+	public String generateShortenedUrl(String originalUrl, Long nextId, Long scrambledId, String encodedValue,
+									   Member member) {
 		log.debug("URL 매핑 생성 시작: kgsId={}, scrambledId={}, shortCode={}", nextId, scrambledId, encodedValue);
 
 		try {
@@ -41,6 +43,7 @@ public class UrlService {
 				.originalUrl(originalUrl)
 				.shortUrl(DOMAIN + "/" + encodedValue)
 				.appId(APP_ID)
+				.member(member)
 				.build();
 
 			urlMappingRepository.save(urlMapping);

@@ -1,15 +1,21 @@
 package luti.server.entity;
 
+import static jakarta.persistence.FetchType.*;
+
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.Fetch;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -17,7 +23,8 @@ public class UrlMapping {
 
 	// 필드
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	@Column(name = "id", nullable = false, updatable = false)
 	private Long id;
 
@@ -35,6 +42,10 @@ public class UrlMapping {
 
 	@Column(name = "app_id", nullable = false, updatable = false)
 	private String appId;
+
+	@ManyToOne(fetch = LAZY)
+	@JoinColumn(name = "member_id")
+	private Member member;
 
 	@CreatedDate
 	@Column(updatable = false)
@@ -70,10 +81,13 @@ public class UrlMapping {
 		return appId;
 	}
 
-
+	public Member getMember() {
+		return member;
+	}
 
 	// 기본 생성자
-	protected UrlMapping() {}
+	protected UrlMapping() {
+	}
 
 	// Builder
 
@@ -84,6 +98,7 @@ public class UrlMapping {
 		this.scrambledId = builder.scrambledId;
 		this.shortUrl = builder.shortUrl;
 		this.appId = builder.appId;
+		this.member = builder.member;
 	}
 
 	// static 팩토리 메서드
@@ -98,9 +113,10 @@ public class UrlMapping {
 		private Long scrambledId;
 		private String shortUrl;
 		private String appId;
+		private Member member;
 
 		public Builder originalUrl(String
-			originalUrl) {
+									   originalUrl) {
 			this.originalUrl = originalUrl;
 			return this;
 		}
@@ -122,6 +138,11 @@ public class UrlMapping {
 
 		public Builder appId(String appId) {
 			this.appId = appId;
+			return this;
+		}
+
+		public Builder member(Member member) {
+			this.member = member;
 			return this;
 		}
 
