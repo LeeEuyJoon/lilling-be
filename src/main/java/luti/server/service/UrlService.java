@@ -2,6 +2,8 @@ package luti.server.service;
 
 import static luti.server.exception.ErrorCode.*;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +15,7 @@ import luti.server.entity.Member;
 import luti.server.entity.UrlMapping;
 import luti.server.repository.UrlMappingRepository;
 import luti.server.exception.BusinessException;
+import luti.server.service.dto.UrlMappingInfo;
 
 @Service
 public class UrlService {
@@ -65,5 +68,12 @@ public class UrlService {
 		log.debug("Redis 캐시 미스 또는 DB 조회 완료: scrambledId={}", scrambledId);
 		return urlMapping.getOriginalUrl();
 	}
+
+	public Optional<UrlMappingInfo> findByDecodedId(Long scrambledId) {
+		log.debug("UrlMappingInfo 조회: scrambledId={}", scrambledId);
+		return urlMappingRepository.findByScrambledId(scrambledId)
+								   .map(UrlMappingInfo::from);
+	}
+
 
 }
