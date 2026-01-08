@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import luti.server.service.Base62Encoder;
+import luti.server.service.ClickCountService;
 import luti.server.service.UrlService;
 
 @Component
@@ -14,16 +15,19 @@ public class RedirectFacade {
 
 	private final Base62Encoder base62Encoder;
 	private final UrlService urlService;
+	private final ClickCountService clickCountService;
 
-	public RedirectFacade(Base62Encoder base62Encoder, UrlService urlService) {
+	public RedirectFacade(Base62Encoder base62Encoder, UrlService urlService, ClickCountService clickCountService) {
 		this.base62Encoder = base62Encoder;
 		this.urlService = urlService;
+		this.clickCountService = clickCountService;
 	}
 
 	public String getOriginalUrl(String shortCode) {
 		log.info("리다이렉트 요청: shortCode={}", shortCode);
 
 		Long decodedId = base62Encoder.decode(shortCode);
+		clickCountService.increaseClickCount(decodedId); // async
 
 		return urlService.getOriginalUrl(decodedId);
 

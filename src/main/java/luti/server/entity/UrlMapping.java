@@ -4,14 +4,12 @@ import static jakarta.persistence.FetchType.*;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.Fetch;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -51,6 +49,9 @@ public class UrlMapping {
 	@Column(updatable = false)
 	private LocalDateTime createdAt;
 
+	@Column(name = "click_count", nullable = false, updatable = true)
+	private Long clickCount;
+
 	// Getter 메서드
 
 	public Long getId() {
@@ -81,8 +82,13 @@ public class UrlMapping {
 		return appId;
 	}
 
+
 	public Member getMember() {
 		return member;
+	}
+
+	public Long getClickCount() {
+		return clickCount;
 	}
 
 	// 기본 생성자
@@ -99,6 +105,7 @@ public class UrlMapping {
 		this.shortUrl = builder.shortUrl;
 		this.appId = builder.appId;
 		this.member = builder.member;
+		this.clickCount = builder.clickCount;
 	}
 
 	// static 팩토리 메서드
@@ -114,6 +121,7 @@ public class UrlMapping {
 		private String shortUrl;
 		private String appId;
 		private Member member;
+		private Long clickCount = 0L;
 
 		public Builder originalUrl(String
 									   originalUrl) {
@@ -143,6 +151,11 @@ public class UrlMapping {
 
 		public Builder member(Member member) {
 			this.member = member;
+			return this;
+		}
+
+		public Builder clickCount(Long clickCount) {
+			this.clickCount = clickCount;
 			return this;
 		}
 

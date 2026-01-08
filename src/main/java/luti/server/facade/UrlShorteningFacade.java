@@ -36,7 +36,6 @@ public class UrlShorteningFacade {
 		log.info("URL 단축 요청: originalUrl={}", originalUrl);
 
 		Member member = authService.getMemberFromAuthentication(authentication);
-
 		Long nextId = keyBlockManager.getNextId();
 		Long scrambledId = idScrambler.scramble(nextId);
 		String encodedValue = base62Encoder.encode(scrambledId);

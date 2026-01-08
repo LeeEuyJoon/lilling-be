@@ -28,7 +28,7 @@ public class RedirectController {
 		String originalUrl = redirectFacade.getOriginalUrl(shortCode);
 
 		return ResponseEntity
-			.status(HttpStatus.MOVED_PERMANENTLY)
+			.status(HttpStatus.FOUND)
 			.location(URI.create(originalUrl))
 			.build();
 	}
