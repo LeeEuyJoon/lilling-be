@@ -2,8 +2,8 @@ package luti.server.exception;
 
 public class ErrorResponse {
 
-	private String code;
-	private String message;
+	private final String code;
+	private final String message;
 
 	public ErrorResponse(String code, String message) {
 		this.code = code;
@@ -12,5 +12,13 @@ public class ErrorResponse {
 
 	public static ErrorResponse of(ErrorCode errorCode) {
 		return new ErrorResponse(errorCode.name(), errorCode.getMessage());
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public String getMessage() {
+		return message;
 	}
 }
