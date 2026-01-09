@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,11 +28,6 @@ public class SecurityConfig {
 		this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
 	}
 
-	/**
-	 * BearerTokenResolver:
-	 * - 기본은 Authorization: Bearer 토큰에서 꺼내지만
-	 * - 우리는 HttpOnly 쿠키(access_token)에서 꺼낸다.
-	 */
 	@Bean
 	public BearerTokenResolver bearerTokenResolver() {
 		return new BearerTokenResolver() {
@@ -53,10 +47,6 @@ public class SecurityConfig {
 		};
 	}
 
-	/**
-	 * CORS:
-	 * - allowCredentials(true) + allowedOriginPatterns 사용(운영/로컬 대응)
-	 */
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource(
 		@Value("${app.cors.allowed-origins}") String allowedOrigins
@@ -108,7 +98,7 @@ public class SecurityConfig {
 		http
 			.authorizeHttpRequests(auth -> auth
 				// My URLs 관련 -> 인증 필요
-				.requestMatchers("/api/v1/urls/my-urls/**").authenticated()
+				.requestMatchers("/api/v1/my-urls/**").authenticated()
 
 				.anyRequest().permitAll()
 			);

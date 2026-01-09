@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import luti.server.entity.Member;
 import luti.server.entity.UrlMapping;
 
 @Repository
@@ -22,4 +23,8 @@ public interface UrlMappingRepository extends JpaRepository<UrlMapping, Long> {
 	@Query("UPDATE UrlMapping u SET u.clickCount = u.clickCount + 1 WHERE u.scrambledId = :scrambledId")
 	void incrementClickCount(@Param("scrambledId") Long scrambledId);
 
+
+	@Modifying(clearAutomatically = true, flushAutomatically = true)
+	@Query("UPDATE UrlMapping u SET u.member.id = :memberId WHERE u.id = :urlMappingId")
+	void claimUrlMappingToMemberById(@Param("urlMappingId") Long urlMappingId, @Param("memberId") Long memberId);
 }

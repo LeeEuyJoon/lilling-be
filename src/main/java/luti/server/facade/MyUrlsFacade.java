@@ -4,10 +4,16 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import luti.server.entity.Member;
+import luti.server.exception.BusinessException;
+import luti.server.exception.ErrorCode;
 import luti.server.facade.dto.UrlVerifyResult;
+import luti.server.service.AuthService;
 import luti.server.service.Base62Encoder;
+import luti.server.service.MyUrlService;
 import luti.server.service.UrlService;
 import luti.server.service.UrlVerifyService;
 import luti.server.service.dto.UrlMappingInfo;
@@ -20,11 +26,16 @@ public class MyUrlsFacade {
 	private final UrlVerifyService urlVerifyService;
 	private final Base62Encoder base62Encoder;
 	private final UrlService urlService;
+	private final AuthService authService;
+	private final MyUrlService myUrlService;
 
-	public MyUrlsFacade(UrlVerifyService urlVerifyService, Base62Encoder base62Encoder, UrlService urlService) {
+	public MyUrlsFacade(UrlVerifyService urlVerifyService, Base62Encoder base62Encoder, UrlService urlService,
+						AuthService authService, MyUrlService myUrlService) {
 		this.urlVerifyService = urlVerifyService;
 		this.base62Encoder = base62Encoder;
 		this.urlService = urlService;
+		this.authService = authService;
+		this.myUrlService = myUrlService;
 	}
 
 	public UrlVerifyResult verify(String shortUrl) {
@@ -57,4 +68,27 @@ public class MyUrlsFacade {
 		return UrlVerifyResult.ok(urlInfo.get());
 	}
 
+	public void claimUrlsToMember(String shortUrl, Authentication authentication) {
+
+		// 1. 인증 객체에서 멤버 정보 추출
+		// 2. 포맷 검증 ('http://' 'https://' 포함하고있으면 제거하고 shortCode만 추출)
+		// 3. shortCode -> id 디코딩
+		// 4. id로 urlMapping 조회
+		// 5. urlMapping 주인 없으면 현재 멤버로 주인 설정
+
+		Member member = authService.getMemberFromAuthentication(authentication); // 이것도 claim api 구현 이후 수정하기
+
+		Optional<String> shortCode =  urlVerifyService.verifyAndExtractShortCode(shortUrl);
+
+		if (shortCode.isEmpty()) {
+			throw new BusinessException(ErrorCode.INVALID_SHORT_URL_FORMAT);
+		}
+
+		Long decodedId = base62Encoder.decode(shortCode.get());
+		UrlMappingInfo urlMappingInfo = urlService.findByDecodedId(decodedId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.SHORT_URL_NOT_FOUND));
+
+		myUrlService.claimUrlMappingToMember(urlMappingInfo, member);
+
+	}
 }

@@ -35,7 +35,7 @@ public class UrlShorteningFacade {
 	public String shortenUrl(String originalUrl, Authentication authentication) {
 		log.info("URL 단축 요청: originalUrl={}", originalUrl);
 
-		Member member = authService.getMemberFromAuthentication(authentication);
+		Member member = authService.getMemberFromAuthentication(authentication); // 으 패서드 레이어에서 엔티티 사용하고 있었네, 일단 두고 나중에 고치자
 		Long nextId = keyBlockManager.getNextId();
 		Long scrambledId = idScrambler.scramble(nextId);
 		String encodedValue = base62Encoder.encode(scrambledId);

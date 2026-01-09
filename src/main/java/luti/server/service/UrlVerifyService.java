@@ -27,7 +27,6 @@ public class UrlVerifyService {
 		log.debug("URL 형식 검증 및 shortCode 추출 시작: url={}", url);
 
 		if (url == null || url.isBlank()) {
-			log.warn("URL이 null 또는 비어있음");
 			return Optional.empty();
 		}
 
@@ -36,7 +35,6 @@ public class UrlVerifyService {
 
 		// DOMAIN으로 시작하지 않으면 실패
 		if (!urlWithoutProtocol.startsWith(DOMAIN + "/")) {
-			log.warn("도메인이 일치하지 않음: expected={}, actual={}", DOMAIN, urlWithoutProtocol);
 			return Optional.empty();
 		}
 
@@ -45,7 +43,6 @@ public class UrlVerifyService {
 
 		// Base62 형식 검증
 		if (!BASE62_PATTERN.matcher(shortCode).matches()) {
-			log.warn("shortCode 형식이 올바르지 않음: shortCode={}", shortCode);
 			return Optional.empty();
 		}
 

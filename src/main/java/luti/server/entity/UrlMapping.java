@@ -42,7 +42,7 @@ public class UrlMapping {
 	private String appId;
 
 	@ManyToOne(fetch = LAZY)
-	@JoinColumn(name = "member_id")
+	@JoinColumn(name = "member_id", nullable = true, updatable = true)
 	private Member member;
 
 	@CreatedDate
