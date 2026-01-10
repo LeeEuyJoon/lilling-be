@@ -16,15 +16,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import luti.server.enums.Provider;
-import luti.server.service.JwtService;
-import luti.server.service.MemberProvisionService;
-import luti.server.service.dto.ProvisionedMemberDto;
+import luti.server.security.dto.ProvisionedMemberDto;
 
 @Component
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-	private final JwtService jwtService;
-	private final MemberProvisionService memberProvisionService;
+	private final JwtProvider jwtProvider;
+	private final OAuth2MemberProvisioner oAuth2MemberProvisioner;
 
 	@Value("${app.frontend.redirect-url:http://localhost:3000/}")
 	private String redirectUrl;
@@ -41,9 +39,9 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 	@Value("${JWT_ACCESS_TTL_SECONDS:3600}")
 	private long accessTtlSeconds;
 
-	public OAuth2LoginSuccessHandler(JwtService jwtService, MemberProvisionService memberProvisionService) {
-		this.jwtService = jwtService;
-		this.memberProvisionService = memberProvisionService;
+	public OAuth2LoginSuccessHandler(JwtProvider jwtProvider, OAuth2MemberProvisioner oAuth2MemberProvisioner) {
+		this.jwtProvider = jwtProvider;
+		this.oAuth2MemberProvisioner = oAuth2MemberProvisioner;
 	}
 
 	@Override
@@ -73,10 +71,10 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 		}
 
 		// DB에서 Member 확보
-		ProvisionedMemberDto pm = memberProvisionService.findOrCreate(Provider.GOOGLE, sub, email);
+		ProvisionedMemberDto pm = oAuth2MemberProvisioner.findOrCreate(Provider.GOOGLE, sub, email);
 
 		// Access JWT 발급 (sub = memberId)
-		String accessToken = jwtService.issueAccessToken(
+		String accessToken = jwtProvider.issueAccessToken(
 			pm.getMemberId().toString(),
 			List.of(pm.getRole().name())
 		);

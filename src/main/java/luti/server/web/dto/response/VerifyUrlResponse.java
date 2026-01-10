@@ -1,9 +1,9 @@
-package luti.server.web.dto;
+package luti.server.web.dto.response;
 
 import java.time.LocalDateTime;
 
 import luti.server.enums.VerifyUrlStatus;
-import luti.server.facade.dto.UrlVerifyResult;
+import luti.server.facade.result.UrlVerifyResult;
 
 public class VerifyUrlResponse {
 
@@ -30,6 +30,26 @@ public class VerifyUrlResponse {
 			verifyResult.getClickCount(),
 			verifyResult.getCreatedAt()
 		);
+	}
+
+	public boolean isValid() {
+		return valid;
+	}
+
+	public String getOriginalUrl() {
+		return originalUrl;
+	}
+
+	public String getShortUrl() {
+		return shortUrl;
+	}
+
+	public Long getClickCount() {
+		return clickCount;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
 	}
 }
 

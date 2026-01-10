@@ -4,18 +4,15 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import luti.server.entity.Member;
 import luti.server.exception.BusinessException;
 import luti.server.exception.ErrorCode;
-import luti.server.facade.dto.UrlVerifyResult;
-import luti.server.service.AuthService;
-import luti.server.service.Base62Encoder;
+import luti.server.facade.command.ClaimUrlCommand;
+import luti.server.facade.result.UrlVerifyResult;
+import luti.server.util.Base62Encoder;
 import luti.server.service.MyUrlService;
 import luti.server.service.UrlService;
-import luti.server.service.UrlVerifyService;
 import luti.server.service.dto.UrlMappingInfo;
 
 @Component
@@ -23,18 +20,14 @@ public class MyUrlsFacade {
 
 	private static final Logger log = LoggerFactory.getLogger(MyUrlsFacade.class);
 
-	private final UrlVerifyService urlVerifyService;
 	private final Base62Encoder base62Encoder;
 	private final UrlService urlService;
-	private final AuthService authService;
 	private final MyUrlService myUrlService;
 
-	public MyUrlsFacade(UrlVerifyService urlVerifyService, Base62Encoder base62Encoder, UrlService urlService,
-						AuthService authService, MyUrlService myUrlService) {
-		this.urlVerifyService = urlVerifyService;
+	public MyUrlsFacade(Base62Encoder base62Encoder, UrlService urlService,
+						MyUrlService myUrlService) {
 		this.base62Encoder = base62Encoder;
 		this.urlService = urlService;
-		this.authService = authService;
 		this.myUrlService = myUrlService;
 	}
 
@@ -47,7 +40,7 @@ public class MyUrlsFacade {
 
 		log.info("단축 URL 추가 가능 검증 요청: shortUrl={}", shortUrl);
 
-		Optional<String> shortCode =  urlVerifyService.verifyAndExtractShortCode(shortUrl);
+		Optional<String> shortCode = urlService.verifyAndExtractShortCode(shortUrl);
 
 		if (shortCode.isEmpty()) {
 			return UrlVerifyResult.invalidFormat();
@@ -68,27 +61,23 @@ public class MyUrlsFacade {
 		return UrlVerifyResult.ok(urlInfo.get());
 	}
 
-	public void claimUrlsToMember(String shortUrl, Authentication authentication) {
+	public void claimUrl(ClaimUrlCommand command) {
 
-		// 1. 인증 객체에서 멤버 정보 추출
-		// 2. 포맷 검증 ('http://' 'https://' 포함하고있으면 제거하고 shortCode만 추출)
-		// 3. shortCode -> id 디코딩
-		// 4. id로 urlMapping 조회
-		// 5. urlMapping 주인 없으면 현재 멤버로 주인 설정
+		// 1. 포맷 검증 ('http://' 'https://' 포함하고있으면 제거하고 shortCode만 추출)
+		// 2. shortCode -> id 디코딩
+		// 3. id로 urlMapping 조회
+		// 4. urlMapping 주인 없으면 현재 멤버로 주인 설정
 
-		Member member = authService.getMemberFromAuthentication(authentication); // 이것도 claim api 구현 이후 수정하기
+		String shortCode = urlService.verifyAndExtractShortCode(command.getShortUrl())
+									 .orElseThrow(
+										 () -> new BusinessException(ErrorCode.INVALID_SHORT_URL_FORMAT));
 
-		Optional<String> shortCode =  urlVerifyService.verifyAndExtractShortCode(shortUrl);
-
-		if (shortCode.isEmpty()) {
-			throw new BusinessException(ErrorCode.INVALID_SHORT_URL_FORMAT);
-		}
-
-		Long decodedId = base62Encoder.decode(shortCode.get());
+		Long decodedId = base62Encoder.decode(shortCode);
 		UrlMappingInfo urlMappingInfo = urlService.findByDecodedId(decodedId)
-			.orElseThrow(() -> new BusinessException(ErrorCode.SHORT_URL_NOT_FOUND));
+												  .orElseThrow(
+													  () -> new BusinessException(ErrorCode.SHORT_URL_NOT_FOUND));
 
-		myUrlService.claimUrlMappingToMember(urlMappingInfo, member);
+		myUrlService.claimUrlMappingToMember(urlMappingInfo, command.getMemberId());
 
 	}
 }

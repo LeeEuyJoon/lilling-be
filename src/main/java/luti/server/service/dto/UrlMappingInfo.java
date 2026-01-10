@@ -12,7 +12,7 @@ public class UrlMappingInfo {
 	private final LocalDateTime createdAt;
 	private final boolean hasOwner;
 
-	public UrlMappingInfo(Long id, String originalUrl, String shortUrl, Long clickCount, LocalDateTime createdAt, boolean hasOwner) {
+	private UrlMappingInfo(Long id, String originalUrl, String shortUrl, Long clickCount, LocalDateTime createdAt, boolean hasOwner) {
 		this.id = id;
 		this.originalUrl = originalUrl;
 		this.shortUrl = shortUrl;

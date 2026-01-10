@@ -1,4 +1,4 @@
-package luti.server.service;
+package luti.server.security;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -12,7 +12,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 @Service
-public class JwtService {
+public class JwtProvider {
 
 	private final JwtEncoder jwtEncoder;
 
@@ -25,7 +25,7 @@ public class JwtService {
 	@Value("${JWT_ACCESS_TTL_SECONDS:3600}")
 	private long accessTtlSeconds;
 
-	public JwtService(JwtEncoder jwtEncoder) {
+	public JwtProvider(JwtEncoder jwtEncoder) {
 		this.jwtEncoder = jwtEncoder;
 	}
 

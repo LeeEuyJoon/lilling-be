@@ -1,19 +1,19 @@
-package luti.server.service;
+package luti.server.security;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import luti.server.entity.Member;
 import luti.server.enums.Provider;
 import luti.server.repository.MemberRepository;
-import luti.server.service.dto.ProvisionedMemberDto;
+import luti.server.security.dto.ProvisionedMemberDto;
 
-@Service
-public class MemberProvisionService {
+@Component
+public class OAuth2MemberProvisioner {
 
 	private final MemberRepository memberRepository;
 
-	public MemberProvisionService(MemberRepository memberRepository) {
+	public OAuth2MemberProvisioner(MemberRepository memberRepository) {
 		this.memberRepository = memberRepository;
 	}
 
@@ -26,13 +26,13 @@ public class MemberProvisionService {
 
 		if (existing != null) {
 			existing.updateEmailIfPresent(email);
-			return new ProvisionedMemberDto(existing.getId(), existing.getRole());
+			return ProvisionedMemberDto.of(existing.getId(), existing.getRole());
 		}
 
 		// 신규 가입
 		Member member = new Member(provider, providerSubject, email);
 		Member savedMember = memberRepository.save(member);
 
-		return new ProvisionedMemberDto(savedMember.getId(), member.getRole());
+		return ProvisionedMemberDto.of(savedMember.getId(), member.getRole());
 	}
 }

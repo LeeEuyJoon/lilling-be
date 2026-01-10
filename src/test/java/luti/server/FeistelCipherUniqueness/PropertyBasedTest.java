@@ -7,7 +7,7 @@ import java.util.List;
 
 import net.jqwik.api.*;
 
-import luti.server.service.IdScrambler;
+import luti.server.util.IdScrambler;
 
 public class PropertyBasedTest {
 

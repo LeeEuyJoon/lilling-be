@@ -5,7 +5,6 @@ import static luti.server.exception.ErrorCode.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import luti.server.entity.Member;
 import luti.server.exception.BusinessException;
 import luti.server.repository.UrlMappingRepository;
 import luti.server.service.dto.UrlMappingInfo;
@@ -20,11 +19,11 @@ public class MyUrlService {
 	}
 
 	@Transactional
-	public void claimUrlMappingToMember(UrlMappingInfo urlMappingInfo, Member member) {
+	public void claimUrlMappingToMember(UrlMappingInfo urlMappingInfo, Long memberId) {
 		if (urlMappingInfo.isHasOwner()) {
 			throw new BusinessException(ALREADY_OWNED_URL);
 		}
-		urlMappingRepository.claimUrlMappingToMemberById(urlMappingInfo.getId(), member.getId());
+		urlMappingRepository.claimUrlMappingToMemberById(urlMappingInfo.getId(), memberId);
 	}
 
 }

@@ -1,8 +1,9 @@
-package luti.server.service;
+package luti.server.util;
 
 import static luti.server.exception.ErrorCode.*;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import luti.server.exception.BusinessException;
@@ -19,7 +20,7 @@ import luti.server.exception.BusinessException;
  *
  * 출력값 검증: 0 이상 3,521,614,606,208 이하의 고유한 정수인지 확인
  */
-@Service
+@Component
 public class IdScrambler {
 
 	@Value("${SCRAMBLING_CONST_XOR1}")

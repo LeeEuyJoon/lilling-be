@@ -3,6 +3,7 @@ package luti.server.service;
 import static luti.server.exception.ErrorCode.*;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import luti.server.entity.Member;
 import luti.server.entity.UrlMapping;
+import luti.server.repository.MemberRepository;
 import luti.server.repository.UrlMappingRepository;
 import luti.server.exception.BusinessException;
 import luti.server.service.dto.UrlMappingInfo;
@@ -23,6 +25,8 @@ public class UrlService {
 	private static final Logger log = LoggerFactory.getLogger(UrlService.class);
 
 	private final UrlMappingRepository urlMappingRepository;
+	private final MemberRepository memberRepository;
+
 
 	@Value("${DOMAIN}")
 	private String DOMAIN;
@@ -30,14 +34,21 @@ public class UrlService {
 	@Value("${APP_ID}")
 	private String APP_ID;
 
-	public UrlService(UrlMappingRepository urlMappingRepository) {
+	private static final Pattern BASE62_PATTERN = Pattern.compile("^[a-zA-Z0-9]{1,7}$");
+
+	public UrlService(UrlMappingRepository urlMappingRepository, MemberRepository memberRepository) {
 		this.urlMappingRepository = urlMappingRepository;
+		this.memberRepository = memberRepository;
 	}
 
 	@Transactional
 	public String generateShortenedUrl(String originalUrl, Long nextId, Long scrambledId, String encodedValue,
-									   Member member) {
+									   Long memberId) {
 		log.debug("URL 매핑 생성 시작: kgsId={}, scrambledId={}, shortCode={}", nextId, scrambledId, encodedValue);
+
+		Member member = Optional.ofNullable(memberId)
+								.flatMap(memberRepository::findById)
+								.orElse(null);
 
 		UrlMapping urlMapping = UrlMapping.builder()
 			.scrambledId(scrambledId)
@@ -73,6 +84,33 @@ public class UrlService {
 		log.debug("UrlMappingInfo 조회: scrambledId={}", scrambledId);
 		return urlMappingRepository.findByScrambledId(scrambledId)
 								   .map(UrlMappingInfo::from);
+	}
+
+	public Optional<String> verifyAndExtractShortCode(String url) {
+		log.debug("URL 형식 검증 및 shortCode 추출 시작: url={}", url);
+
+		if (url == null || url.isBlank()) {
+			return Optional.empty();
+		}
+
+		// 프로토콜 제거 (http://, https:// 제거)
+		String urlWithoutProtocol = url.replaceFirst("^https?://", "");
+
+		// DOMAIN으로 시작하지 않으면 실패
+		if (!urlWithoutProtocol.startsWith(DOMAIN + "/")) {
+			return Optional.empty();
+		}
+
+		// shortCode 추출
+		String shortCode = urlWithoutProtocol.substring(DOMAIN.length() + 1);
+
+		// Base62 형식 검증
+		if (!BASE62_PATTERN.matcher(shortCode).matches()) {
+			return Optional.empty();
+		}
+
+		log.debug("URL 형식 검증 성공: url={}, shortCode={}", url, shortCode);
+		return Optional.of(shortCode);
 	}
 
 

@@ -1,4 +1,4 @@
-package luti.server.service.dto;
+package luti.server.security.dto;
 
 import luti.server.enums.Role;
 
@@ -7,7 +7,7 @@ public class ProvisionedMemberDto {
 	private final Long memberId;
 	private final Role role;
 
-	public ProvisionedMemberDto(Long memberId, Role role) {
+	private ProvisionedMemberDto(Long memberId, Role role) {
 		this.memberId = memberId;
 		this.role = role;
 	}
@@ -18,5 +18,9 @@ public class ProvisionedMemberDto {
 
 	public Role getRole() {
 		return role;
+	}
+
+	public static ProvisionedMemberDto of(Long memberId, Role role) {
+		return new ProvisionedMemberDto(memberId, role);
 	}
 }

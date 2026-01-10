@@ -1,4 +1,4 @@
-package luti.server.facade.dto;
+package luti.server.facade.result;
 
 import java.time.LocalDateTime;
 
@@ -13,7 +13,7 @@ public class UrlVerifyResult {
 	private final Long clickCount;
 	private final LocalDateTime createdAt;
 
-	public UrlVerifyResult(VerifyUrlStatus status, String originalUrl, String shortUrl, Long clickCount,
+	private UrlVerifyResult(VerifyUrlStatus status, String originalUrl, String shortUrl, Long clickCount,
 						   LocalDateTime createdAt) {
 		this.status = status;
 		this.originalUrl = originalUrl;

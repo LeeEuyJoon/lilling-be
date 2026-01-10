@@ -1,13 +1,14 @@
-package luti.server.service;
+package luti.server.util;
 
 import static luti.server.exception.ErrorCode.*;
 
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import luti.server.exception.BusinessException;
 
 
-@Service
+@Component
 public class Base62Encoder {
 
 	private static final String CHARACTERS =
