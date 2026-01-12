@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import luti.server.facade.MyUrlsFacade;
@@ -26,8 +27,8 @@ public class MyUrlsController {
 		this.myUrlsFacade = myUrlsFacade;
 	}
 
-	@GetMapping("/verify/{shortUrl}")
-	public ResponseEntity<VerifyUrlResponse> verify(@PathVariable("shortUrl") String shortUrl) {
+	@GetMapping("/verify")
+	public ResponseEntity<VerifyUrlResponse> verify(@RequestParam("shortUrl") String shortUrl) {
 
 		UrlVerifyResult verifyResult = myUrlsFacade.verify(shortUrl);
 		VerifyUrlResponse response = VerifyUrlResponse.from(verifyResult);

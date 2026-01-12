@@ -63,4 +63,8 @@ public class UrlVerifyResult {
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
+
+	public boolean isOk() {
+		return status == VerifyUrlStatus.OK;
+	}
 }
