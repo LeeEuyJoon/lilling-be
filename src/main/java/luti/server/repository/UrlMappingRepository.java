@@ -2,6 +2,8 @@ package luti.server.repository;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +29,8 @@ public interface UrlMappingRepository extends JpaRepository<UrlMapping, Long> {
 	@Modifying(clearAutomatically = true, flushAutomatically = true)
 	@Query("UPDATE UrlMapping u SET u.member.id = :memberId WHERE u.id = :urlMappingId")
 	void claimUrlMappingToMemberById(@Param("urlMappingId") Long urlMappingId, @Param("memberId") Long memberId);
+
+	Page<UrlMapping> findByMember_IdOrderByCreatedAtDesc(Long memberId, Pageable pageable);
+
+
 }

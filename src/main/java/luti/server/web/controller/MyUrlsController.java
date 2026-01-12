@@ -3,7 +3,6 @@ package luti.server.web.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,8 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import luti.server.facade.MyUrlsFacade;
 import luti.server.facade.command.ClaimUrlCommand;
+import luti.server.facade.command.MyUrlsCommand;
+import luti.server.facade.result.MyUrlsListResult;
 import luti.server.facade.result.UrlVerifyResult;
+import luti.server.web.mapper.MyUrlsCommandMapper;
 import luti.server.web.dto.request.ClaimRequest;
+import luti.server.web.dto.response.MyUrlsListResponse;
 import luti.server.web.dto.response.VerifyUrlResponse;
 import luti.server.web.mapper.ClaimUrlCommandMapper;
 
@@ -43,5 +46,17 @@ public class MyUrlsController {
 		myUrlsFacade.claimUrl(command);
 
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/list")
+	public ResponseEntity<MyUrlsListResponse> getMyUrls(@RequestParam(value = "page", defaultValue = "0") Integer page,
+														@RequestParam(value = "size", defaultValue = "10") Integer size,
+														Authentication authentication) {
+
+		MyUrlsCommand command = MyUrlsCommandMapper.toCommand(page, size, authentication);
+		MyUrlsListResult result = myUrlsFacade.getMyUrls(command);
+		MyUrlsListResponse response = MyUrlsListResponse.from(result);
+
+		return ResponseEntity.ok(response);
 	}
 }

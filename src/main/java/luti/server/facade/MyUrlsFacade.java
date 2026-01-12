@@ -7,11 +7,14 @@ import org.springframework.stereotype.Component;
 import luti.server.exception.BusinessException;
 import luti.server.exception.ErrorCode;
 import luti.server.facade.command.ClaimUrlCommand;
+import luti.server.facade.command.MyUrlsCommand;
+import luti.server.facade.result.MyUrlsListResult;
 import luti.server.facade.result.UrlVerifyResult;
 import luti.server.facade.validation.UrlValidationChainBuilder;
 import luti.server.facade.validation.UrlValidationContext;
 import luti.server.facade.validation.UrlValidationHandler;
 import luti.server.service.MyUrlService;
+import luti.server.service.dto.MyUrlsListInfo;
 
 @Component
 public class MyUrlsFacade {
@@ -48,5 +51,16 @@ public class MyUrlsFacade {
 		}
 
 		myUrlService.claimUrlMappingToMember(context.getUrlMappingInfo(), command.getMemberId());
+	}
+
+	public MyUrlsListResult getMyUrls(MyUrlsCommand command) {
+
+		log.info("단축 URL 목록 조회 요청: memberId={}, page={}, size={}",
+				command.getMemberId(), command.getPage(), command.getSize());
+
+		MyUrlsListInfo urlsListInfo = myUrlService.getMyUrls(command.getMemberId(), command.getPage(), command.getSize());
+
+		return MyUrlsListResult.from(urlsListInfo);
+
 	}
 }

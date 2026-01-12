@@ -52,6 +52,9 @@ public class UrlMapping {
 	@Column(name = "click_count", nullable = false, updatable = true)
 	private Long clickCount;
 
+	@Column(name = "description", nullable = true, updatable = true)
+	private String description;
+
 	// Getter 메서드
 
 	public Long getId() {
@@ -91,6 +94,10 @@ public class UrlMapping {
 		return clickCount;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
 	// 기본 생성자
 	protected UrlMapping() {
 	}
@@ -106,6 +113,7 @@ public class UrlMapping {
 		this.appId = builder.appId;
 		this.member = builder.member;
 		this.clickCount = builder.clickCount;
+		this.description = builder.description;
 	}
 
 	// static 팩토리 메서드
@@ -122,6 +130,7 @@ public class UrlMapping {
 		private String appId;
 		private Member member;
 		private Long clickCount = 0L;
+		private String description;
 
 		public Builder originalUrl(String
 									   originalUrl) {
@@ -156,6 +165,11 @@ public class UrlMapping {
 
 		public Builder clickCount(Long clickCount) {
 			this.clickCount = clickCount;
+			return this;
+		}
+
+		public Builder description(String description) {
+			this.description = description;
 			return this;
 		}
 
