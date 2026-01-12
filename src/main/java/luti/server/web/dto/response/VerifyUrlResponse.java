@@ -7,14 +7,16 @@ import luti.server.facade.result.UrlVerifyResult;
 
 public class VerifyUrlResponse {
 
+	private final VerifyUrlStatus status;
 	private final boolean valid;
 	private final String originalUrl;
 	private final String shortUrl;
 	private final Long clickCount;
 	private final LocalDateTime createdAt;
 
-	private VerifyUrlResponse(boolean valid, String originalUrl, String shortUrl,
+	private VerifyUrlResponse(VerifyUrlStatus status, boolean valid, String originalUrl, String shortUrl,
 							  Long clickCount, LocalDateTime createdAt) {
+		this.status = status;
 		this.valid = valid;
 		this.originalUrl = originalUrl;
 		this.shortUrl = shortUrl;
@@ -24,12 +26,17 @@ public class VerifyUrlResponse {
 
 	public static VerifyUrlResponse from(UrlVerifyResult verifyResult) {
 		return new VerifyUrlResponse(
+			verifyResult.getStatus(),
 			verifyResult.getStatus() == VerifyUrlStatus.OK,
 			verifyResult.getOriginalUrl(),
 			verifyResult.getShortUrl(),
 			verifyResult.getClickCount(),
 			verifyResult.getCreatedAt()
 		);
+	}
+
+	public VerifyUrlStatus getStatus() {
+		return status;
 	}
 
 	public boolean isValid() {
