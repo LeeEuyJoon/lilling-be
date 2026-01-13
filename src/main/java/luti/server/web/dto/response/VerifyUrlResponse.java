@@ -2,8 +2,8 @@ package luti.server.web.dto.response;
 
 import java.time.LocalDateTime;
 
-import luti.server.enums.VerifyUrlStatus;
-import luti.server.facade.result.UrlVerifyResult;
+import luti.server.domain.enums.VerifyUrlStatus;
+import luti.server.application.result.UrlVerifyResult;
 
 public class VerifyUrlResponse {
 

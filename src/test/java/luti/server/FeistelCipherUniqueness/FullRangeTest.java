@@ -7,7 +7,7 @@ import java.util.HashSet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import luti.server.util.IdScrambler;
+import luti.server.domain.util.IdScrambler;
 
 public class FullRangeTest {
 

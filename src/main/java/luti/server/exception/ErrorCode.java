@@ -45,6 +45,7 @@ public enum ErrorCode {
 	INVALID_SHORT_URL_FORMAT("6001", HttpStatus.BAD_REQUEST, "잘못된 단축 URL 형식입니다"),
 	SHORT_URL_NOT_FOUND("6002", HttpStatus.NOT_FOUND, "단축 URL을 찾을 수 없습니다"),
 	ALREADY_OWNED_URL("6003", HttpStatus.CONFLICT, "이미 소유된 단축 URL 입니다"),
+	NOT_URL_OWNER("6004", HttpStatus.FORBIDDEN, "단축 URL의 소유자가 아닙니다"),
 
 	UNAUTHORIZED("7001", HttpStatus.UNAUTHORIZED, "인증이 필요합니다");
 

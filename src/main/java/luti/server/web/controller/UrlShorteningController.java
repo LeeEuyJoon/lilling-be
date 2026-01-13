@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import luti.server.facade.UrlShorteningFacade;
-import luti.server.facade.command.ShortenUrlCommand;
-import luti.server.facade.result.ShortenUrlResult;
+import luti.server.application.facade.UrlShorteningFacade;
+import luti.server.application.command.ShortenUrlCommand;
+import luti.server.application.result.ShortenUrlResult;
 import luti.server.web.dto.request.ShortenRequest;
 import luti.server.web.dto.response.ShortenResponse;
 import luti.server.web.mapper.ShortenUrlCommandMapper;

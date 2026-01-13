@@ -4,7 +4,7 @@ import static luti.server.web.mapper.AuthExtractor.*;
 
 import org.springframework.security.core.Authentication;
 
-import luti.server.facade.command.ClaimUrlCommand;
+import luti.server.application.command.ClaimUrlCommand;
 import luti.server.web.dto.request.ClaimRequest;
 
 public class ClaimUrlCommandMapper {

@@ -1,6 +1,6 @@
 package luti.server.web.dto.response;
 
-import luti.server.facade.result.ShortenUrlResult;
+import luti.server.application.result.ShortenUrlResult;
 
 public class ShortenResponse {
 

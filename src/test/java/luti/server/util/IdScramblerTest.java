@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import luti.server.domain.util.IdScrambler;
 import luti.server.exception.BusinessException;
 
 class IdScramblerTest {

@@ -2,7 +2,7 @@ package luti.server.web.dto.response;
 
 import java.util.List;
 
-import luti.server.facade.result.MyUrlsListResult;
+import luti.server.application.result.MyUrlsListResult;
 
 public class MyUrlsListResponse {
 

@@ -21,13 +21,13 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import luti.server.client.KgsClient;
-import luti.server.client.dto.KeyBlock;
-import luti.server.entity.Member;
-import luti.server.entity.UrlMapping;
-import luti.server.enums.Provider;
-import luti.server.repository.MemberRepository;
-import luti.server.repository.UrlMappingRepository;
+import luti.server.infrastructure.client.kgs.KgsClient;
+import luti.server.infrastructure.client.kgs.KeyBlock;
+import luti.server.domain.model.Member;
+import luti.server.domain.model.UrlMapping;
+import luti.server.domain.enums.Provider;
+import luti.server.infrastructure.persistence.MemberRepository;
+import luti.server.infrastructure.persistence.UrlMappingRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc

@@ -17,6 +17,8 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import luti.server.infrastructure.security.JwtProvider;
+
 @SpringBootTest
 @Testcontainers
 class JwtProviderTest {

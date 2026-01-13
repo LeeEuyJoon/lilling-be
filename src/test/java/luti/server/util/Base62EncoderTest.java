@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import luti.server.domain.util.Base62Encoder;
 import luti.server.exception.BusinessException;
 
 class Base62EncoderTest {

@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import luti.server.facade.RedirectFacade;
-import luti.server.facade.result.RedirectResult;
+import luti.server.application.facade.RedirectFacade;
+import luti.server.application.result.RedirectResult;
 
 @RestController
 @RequestMapping("/")
