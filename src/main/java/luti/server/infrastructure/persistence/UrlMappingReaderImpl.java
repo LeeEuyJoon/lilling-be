@@ -30,6 +30,6 @@ public class UrlMappingReaderImpl implements UrlMappingReader {
 
 	@Override
 	public Page<UrlMapping> findByMemberId(Long memberId, Pageable pageable) {
-		return repository.findByMember_IdOrderByCreatedAtDesc(memberId, pageable);
+		return repository.findByMember_IdAndDeletedAtIsNullOrderByCreatedAtDesc(memberId, pageable);
 	}
 }

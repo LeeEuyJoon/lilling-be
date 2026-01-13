@@ -1,6 +1,7 @@
 package luti.server.infrastructure.persistence;
 
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -30,9 +31,14 @@ public interface UrlMappingRepository extends JpaRepository<UrlMapping, Long> {
 	@Query("UPDATE UrlMapping u SET u.member.id = :memberId WHERE u.id = :urlMappingId")
 	void claimUrlMappingToMemberById(@Param("urlMappingId") Long urlMappingId, @Param("memberId") Long memberId);
 
-	Page<UrlMapping> findByMember_IdOrderByCreatedAtDesc(Long memberId, Pageable pageable);
+	Page<UrlMapping> findByMember_IdAndDeletedAtIsNullOrderByCreatedAtDesc(Long memberId, Pageable pageable);
 
 	@Modifying(clearAutomatically = true, flushAutomatically = true)
 	@Query("UPDATE UrlMapping u SET u.description = :description WHERE u.id = :urlId")
 	void updateDescriptionById(@Param("urlId") Long urlId, @Param("description") String description);
+
+	@Modifying(clearAutomatically = true, flushAutomatically = true)
+	@Query("UPDATE UrlMapping u SET u.deletedAt = :deletedAt, u.isDeleted = true WHERE u.id = :id")
+	void softDeleteById(@Param("id") Long id, @Param("deletedAt") LocalDateTime deletedAt);
+
 }

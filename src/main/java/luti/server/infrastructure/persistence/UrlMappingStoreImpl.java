@@ -1,5 +1,7 @@
 package luti.server.infrastructure.persistence;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Component;
 
 import luti.server.domain.model.UrlMapping;
@@ -21,7 +23,7 @@ public class UrlMappingStoreImpl implements UrlMappingStore {
 
 	@Override
 	public void deleteById(Long id) {
-		repository.deleteById(id);
+		repository.softDeleteById(id, LocalDateTime.now());
 	}
 
 	@Override

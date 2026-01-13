@@ -55,6 +55,12 @@ public class UrlMapping {
 	@Column(name = "description", nullable = true, updatable = true)
 	private String description;
 
+	@Column(name = "is_deleted", nullable = true, updatable = true)
+	private Boolean isDeleted = false;
+
+	@Column(name = "deleted_at", nullable = true, updatable = true)
+	private LocalDateTime deletedAt = null;
+
 	// Getter 메서드
 
 	public Long getId() {
@@ -85,7 +91,6 @@ public class UrlMapping {
 		return appId;
 	}
 
-
 	public Member getMember() {
 		return member;
 	}
@@ -97,6 +102,10 @@ public class UrlMapping {
 	public String getDescription() {
 		return description;
 	}
+
+	public Boolean getDeleted() { return isDeleted; }
+
+	public LocalDateTime getDeletedAt() { return deletedAt; }
 
 	// 기본 생성자
 	protected UrlMapping() {
