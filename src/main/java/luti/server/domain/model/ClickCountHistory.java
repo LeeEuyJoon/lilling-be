@@ -13,11 +13,22 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Table(
+	name = "click_count_history",
+	indexes = @Index(name = "idx_url_mapping_hour", columnList = "url_mapping_id, hour"),
+	uniqueConstraints = @UniqueConstraint(
+		name = "uk_url_mapping_hour",
+		columnNames = {"url_mapping_id", "hour"}
+	)
+)
 public class ClickCountHistory {
 
 	// 필드

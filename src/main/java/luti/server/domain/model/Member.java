@@ -8,6 +8,14 @@ import luti.server.domain.enums.Role;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Table(
+	name = "member",
+	uniqueConstraints = @UniqueConstraint(
+		name = "uk_provider_subject",
+		columnNames = {"provider", "provider_subject"}
+	),
+	indexes = @Index(name = "idx_email", columnList = "email")
+)
 public class Member {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)

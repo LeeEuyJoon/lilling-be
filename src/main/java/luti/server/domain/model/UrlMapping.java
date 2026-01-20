@@ -12,11 +12,19 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Table(
+	name = "url_mapping",
+	indexes = {
+		@Index(name = "idx_member_id", columnList = "member_id"),
+	}
+)
 public class UrlMapping {
 
 	// 필드
