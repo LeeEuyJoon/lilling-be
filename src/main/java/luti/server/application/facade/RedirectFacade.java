@@ -28,7 +28,7 @@ public class RedirectFacade {
 		log.info("리다이렉트 요청: shortCode={}", shortCode);
 
 		Long decodedId = base62Encoder.decode(shortCode);
-		clickCountService.increaseClickCount(decodedId); // async
+		clickCountService.recordClick(decodedId); // async
 
 		String originalUrl = urlService.getOriginalUrl(decodedId);
 		RedirectResult result = RedirectResult.of(originalUrl);
