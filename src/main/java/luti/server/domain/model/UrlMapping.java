@@ -107,13 +107,10 @@ public class UrlMapping {
 
 	public LocalDateTime getDeletedAt() { return deletedAt; }
 
-	// 기본 생성자
+	// 생성자
 	protected UrlMapping() {
 	}
 
-	// Builder
-
-	// Builder용 private 생성자
 	private UrlMapping(Builder builder) {
 		this.originalUrl = builder.originalUrl;
 		this.kgsId = builder.kgsId;
@@ -124,6 +121,8 @@ public class UrlMapping {
 		this.clickCount = builder.clickCount;
 		this.description = builder.description;
 	}
+
+	// Builder
 
 	// static 팩토리 메서드
 	public static Builder builder() {
