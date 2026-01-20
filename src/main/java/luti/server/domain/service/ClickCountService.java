@@ -20,7 +20,7 @@ public class ClickCountService {
 		this.urlMappingStore = urlMappingStore;
 	}
 
-	private static final String CLICK_COUNT_KEY_PREFIX = "click_count:";
+	private static final String CLICK_COUNT_KEY_PREFIX = "click:count:";
 	private static final String DIRTY_SET_KEY = "click:dirty";
 
 	/**
