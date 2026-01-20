@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import luti.server.domain.model.UrlMapping;
-import luti.server.domain.repository.UrlMappingReader;
+import luti.server.domain.port.UrlMappingReader;
 
 @Component
 public class UrlMappingReaderImpl implements UrlMappingReader {

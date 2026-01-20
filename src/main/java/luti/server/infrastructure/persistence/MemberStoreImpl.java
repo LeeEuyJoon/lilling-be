@@ -3,7 +3,7 @@ package luti.server.infrastructure.persistence;
 import org.springframework.stereotype.Component;
 
 import luti.server.domain.model.Member;
-import luti.server.domain.repository.MemberStore;
+import luti.server.domain.port.MemberStore;
 
 @Component
 public class MemberStoreImpl implements MemberStore {

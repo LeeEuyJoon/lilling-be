@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
 
 import luti.server.domain.model.UrlMapping;
-import luti.server.domain.repository.UrlMappingStore;
+import luti.server.domain.port.UrlMappingStore;
 
 @Component
 public class UrlMappingStoreImpl implements UrlMappingStore {

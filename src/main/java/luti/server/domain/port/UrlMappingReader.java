@@ -1,4 +1,4 @@
-package luti.server.domain.repository;
+package luti.server.domain.port;
 
 import java.util.Optional;
 

@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import luti.server.domain.model.UrlMapping;
-import luti.server.domain.repository.UrlMappingReader;
-import luti.server.domain.repository.UrlMappingStore;
+import luti.server.domain.port.UrlMappingReader;
+import luti.server.domain.port.UrlMappingStore;
 import luti.server.exception.BusinessException;
 import luti.server.domain.service.dto.MyUrlsListInfo;
 import luti.server.domain.service.dto.UrlMappingInfo;

@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import luti.server.domain.model.Member;
-import luti.server.domain.repository.MemberReader;
+import luti.server.domain.port.MemberReader;
 
 @Component
 public class MemberReaderImpl implements MemberReader {
