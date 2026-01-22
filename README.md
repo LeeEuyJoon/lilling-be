@@ -16,6 +16,20 @@ Little Linking의 의미를 담고 있는 Lilling 서비스는 URL Shortner 웹 
 - 🧩 **KGS Repository** → [https://github.com/LeeEuyJoon/lilling-kgs](https://github.com/LeeEuyJoon/lilling-kgs)
 - 💻 **Frontend Repository** → [https://github.com/LeeEuyJoon/lilling-fe](https://github.com/LeeEuyJoon/lilling-fe)
 
+<br>
+
+## 주요 화면
+
+<table border="0">
+  <tr>
+    <td>
+      <img width="100%" alt="image1" src="https://github.com/user-attachments/assets/7d781e54-970b-4c96-a023-60086210c17c" />
+    </td>
+    <td>
+      <img width="100%" alt="image" src="https://github.com/user-attachments/assets/ede92422-d35a-48e2-96bc-4201d4f59b40" />
+    </td>
+  </tr>
+</table>
 
 <br>
 
