@@ -1,5 +1,6 @@
 package luti.server.web.dto.response;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import luti.server.application.result.MyUrlsListResult;
@@ -21,6 +22,7 @@ public class MyUrlsListResponse {
 		response.totalPages = result.getTotalPages();
 		response.currentPage = result.getCurrentPage();
 		response.pageSize = result.getPageSize();
+
 		return response;
 	}
 
@@ -43,4 +45,8 @@ public class MyUrlsListResponse {
 	public Long getPageSize() {
 		return pageSize;
 	}
+
+
+
+
 }

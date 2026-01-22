@@ -1,19 +1,21 @@
 package luti.server.application.result;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import luti.server.domain.service.dto.MyUrlsListInfo;
+import luti.server.domain.service.dto.RecentDailyStatisticsInfo;
 
 public class MyUrlsListResult {
-	private final List<MyUrlItem> urls;
+	private final List<MyUrlItemResult> urls;
 	private final Long totalElements;
 	private final Long totalPages;
 	private final Long currentPage;
 	private final Long pageSize;
 
-	private MyUrlsListResult(List<MyUrlItem> urls, Long totalElements, Long totalPages, Long currentPage,
-							Long pageSize) {
+	private MyUrlsListResult(List<MyUrlItemResult> urls, Long totalElements, Long totalPages, Long currentPage,
+							 Long pageSize) {
 		this.urls = urls;
 		this.totalElements = totalElements;
 		this.totalPages = totalPages;
@@ -21,50 +23,74 @@ public class MyUrlsListResult {
 		this.pageSize = pageSize;
 	}
 
-	public static MyUrlsListResult from(MyUrlsListInfo info) {
+	public static MyUrlsListResult from(MyUrlsListInfo urlsInfo, RecentDailyStatisticsInfo statsInfo) {
 
-		List<MyUrlItem> items = info.getUrls().stream()
-				.map(item -> MyUrlItem.of(
-						item.getId(),
-						item.getShortUrl(),
-						item.getOriginalUrl(),
-						item.getDescription(),
-						item.getCreatedAt(),
-						item.getClickCount()
-				))
-				.toList();
+		List<MyUrlItemResult> items = urlsInfo.getUrls().stream()
+										.map(item -> {
+											// 해당 URL의 통계 조회
+											List<RecentDailyStatisticsInfo.DailyStat> stats =
+												statsInfo.getStatisticsForUrl(item.getId());
+
+											// DailyStat → DailyStatsSummaryResult 변환
+											List<MyUrlItemResult.DailyStatsSummaryResult> summaries = stats.stream()
+																							   .map(
+																								   stat -> MyUrlItemResult.DailyStatsSummaryResult
+																									   .of(
+																										   LocalDate
+																											   .parse(
+																												   stat
+																													   .getDate()),
+																										   stat
+																											   .getClickCount()
+																									   ))
+																							   .toList();
+
+											// 통계 포함하여 MyUrlItemResult 생성
+											return MyUrlItemResult.of(
+												item.getId(),
+												item.getShortUrl(),
+												item.getOriginalUrl(),
+												item.getDescription(),
+												item.getCreatedAt(),
+												item.getClickCount(),
+												summaries
+											);
+										})
+										.toList();
 
 		return new MyUrlsListResult(
-				items,
-				info.getTotalElements(),
-				info.getTotalPages(),
-				info.getCurrentPage(),
-				info.getPageSize()
+			items,
+			urlsInfo.getTotalElements(),
+			urlsInfo.getTotalPages(),
+			urlsInfo.getCurrentPage(),
+			urlsInfo.getPageSize()
 		);
-
 	}
 
-	public static class MyUrlItem {
+	public static class MyUrlItemResult {
 		private final Long id;
 		private final String shortUrl;
 		private final String originalUrl;
 		private final String description;
 		private final LocalDateTime createdAt;
 		private final Long clickCount;
+		private final List<DailyStatsSummaryResult> recentDailyStats;
 
-		private MyUrlItem(Long id, String shortUrl, String originalUrl, String description, LocalDateTime createdAt,
-						 Long clickCount) {
+		private MyUrlItemResult(Long id, String shortUrl, String originalUrl, String description, LocalDateTime createdAt,
+						  Long clickCount, List<DailyStatsSummaryResult> recentDailyStats) {
 			this.id = id;
 			this.shortUrl = shortUrl;
 			this.originalUrl = originalUrl;
 			this.description = description;
 			this.createdAt = createdAt;
 			this.clickCount = clickCount;
+			this.recentDailyStats = recentDailyStats;
 		}
 
-		public static MyUrlItem of(Long id, String shortUrl, String originalUrl, String description,
-									   LocalDateTime createdAt, Long clickCount) {
-			return new MyUrlItem(id, shortUrl, originalUrl, description, createdAt, clickCount);
+		public static MyUrlItemResult of(Long id, String shortUrl, String originalUrl, String description,
+								   LocalDateTime createdAt, Long clickCount,
+								   List<DailyStatsSummaryResult> recentDailyStats) {
+			return new MyUrlItemResult(id, shortUrl, originalUrl, description, createdAt, clickCount, recentDailyStats);
 		}
 
 		public Long getId() {
@@ -90,9 +116,35 @@ public class MyUrlsListResult {
 		public Long getClickCount() {
 			return clickCount;
 		}
+
+		public List<DailyStatsSummaryResult> getRecentDailyStats() {
+			return recentDailyStats;
+		}
+
+		public static class DailyStatsSummaryResult {
+			private final LocalDate date;
+			private final Long clickCount;
+
+			private DailyStatsSummaryResult(LocalDate date, Long clickCount) {
+				this.date = date;
+				this.clickCount = clickCount;
+			}
+
+			public static DailyStatsSummaryResult of(LocalDate date, Long clickCount) {
+				return new DailyStatsSummaryResult(date, clickCount);
+			}
+
+			public LocalDate getDate() {
+				return date;
+			}
+
+			public Long getClickCount() {
+				return clickCount;
+			}
+		}
 	}
 
-	public List<MyUrlItem> getUrls() {
+	public List<MyUrlItemResult> getUrls() {
 		return urls;
 	}
 

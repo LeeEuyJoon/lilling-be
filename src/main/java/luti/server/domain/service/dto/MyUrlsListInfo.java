@@ -57,6 +57,12 @@ public class MyUrlsListInfo {
 		return pageSize;
 	}
 
+	public List<Long> getUrlIds() {
+		return urls.stream()
+			.map(MyUrlItemInfo::getId)
+			.toList();
+	}
+
 	public static class MyUrlItemInfo {
 		private final Long id;
 		private final String shortUrl;
