@@ -26,7 +26,7 @@ Little Linking의 의미를 담고 있는 Lilling 서비스는 URL Shortner 웹 
       <img width="100%" alt="image1" src="https://github.com/user-attachments/assets/7d781e54-970b-4c96-a023-60086210c17c" />
     </td>
     <td>
-      <img width="100%" alt="image" src="https://github.com/user-attachments/assets/ede92422-d35a-48e2-96bc-4201d4f59b40" />
+      <img width="100%" alt="image" src="https://github.com/user-attachments/assets/29b0212d-d79f-493e-8448-188c73486b47" />
     </td>
   </tr>
 </table>
