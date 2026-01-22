@@ -42,6 +42,9 @@ spring:
               - openid
               - email
               - profile
+  batch:
+    job:
+      enabled: false
 
 app:
   cors:
