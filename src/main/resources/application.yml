@@ -46,6 +46,12 @@ spring:
     jdbc:
       initialize-schema: always
 
+batch:
+  schedule:
+    click-count-sync:
+      initial-delay: ${BATCH_INITIAL_DELAY:60000}  # 기본값: 1분 (밀리초)
+      fixed-delay: ${BATCH_FIXED_DELAY:300000}     # 기본값: 5분 (밀리초)
+
 app:
   cors:
     allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:3000}
