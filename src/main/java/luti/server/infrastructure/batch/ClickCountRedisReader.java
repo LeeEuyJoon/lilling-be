@@ -52,9 +52,14 @@ public class ClickCountRedisReader implements ItemReader<ClickCountData> {
 				break;
 			}
 
-			// 카운트 읽고 0으로 리셋
+			// 카운트 읽고 키 삭제
 			String countKey = CLICK_COUNT_KEY_PREFIX + scrambledId;
-			Long count = redisTemplate.opsForValue().getAndSet(countKey, 0L);
+			Long count = redisTemplate.opsForValue().getAndDelete(countKey);
+
+			// null이거나 0이면 skip (키 만료 또는 비정상 데이터)
+			if (count == null || count == 0L) {
+				continue;
+			}
 
 			result.add(ClickCountData.of(scrambledId, count));
 		}
