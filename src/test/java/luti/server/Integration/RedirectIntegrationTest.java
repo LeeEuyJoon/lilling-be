@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -70,14 +71,29 @@ class RedirectIntegrationTest {
 	@Autowired
 	private UrlMappingRepository urlMappingRepository;
 
+	@Autowired
+	private RedisTemplate<String, Long> redisTemplate;
+
 	@BeforeEach
 	void setUp() {
 		urlMappingRepository.deleteAll();
+
+		// Redis 클릭 카운트 데이터 초기화
+		redisTemplate.delete(redisTemplate.keys("click:*"));
 
 		// KgsClient Mock 설정
 		when(kgsClient.fetchNextBlock())
 			.thenReturn(new KeyBlock(26001, 27000))
 			.thenReturn(new KeyBlock(27001, 28000));
+	}
+
+	/**
+	 * Redis에서 클릭 카운트 조회
+	 */
+	private Long getClickCountFromRedis(Long scrambledId) {
+		String countKey = "click:count:" + scrambledId;
+		Long count = redisTemplate.opsForValue().get(countKey);
+		return count != null ? count : 0L;
 	}
 
 	@Test
@@ -118,10 +134,11 @@ class RedirectIntegrationTest {
 		UrlMapping saved = urlMappingRepository.findAll().get(0);
 		String shortUrl = saved.getShortUrl();
 		String shortCode = shortUrl.substring(shortUrl.lastIndexOf("/") + 1);
-		Long initialClickCount = saved.getClickCount();
+		Long scrambledId = saved.getScrambledId();
 
 		System.out.println("=== 클릭 횟수 증가 테스트 ===");
-		System.out.println("초기 클릭 횟수: " + initialClickCount);
+		System.out.println("ScrambledId: " + scrambledId);
+		System.out.println("초기 Redis 클릭 횟수: " + getClickCountFromRedis(scrambledId));
 
 		// When: 리다이렉트 호출
 		mockMvc.perform(get("/" + shortCode))
@@ -130,16 +147,14 @@ class RedirectIntegrationTest {
 		// 비동기 처리 대기
 		Thread.sleep(1000);
 
-		// Then: DB에서 클릭 횟수 확인
-		UrlMapping updated = urlMappingRepository.findById(saved.getId())
-			.orElseThrow(() -> new AssertionError("엔티티를 찾을 수 없음"));
+		// Then: Redis에서 클릭 횟수 확인
+		Long redisClickCount = getClickCountFromRedis(scrambledId);
+		System.out.println("업데이트된 Redis 클릭 횟수: " + redisClickCount);
 
-		System.out.println("업데이트된 클릭 횟수: " + updated.getClickCount());
+		assertEquals(1L, redisClickCount,
+			"Redis에 클릭 횟수가 1로 기록되어야 함");
 
-		assertEquals(initialClickCount + 1, updated.getClickCount(),
-			"클릭 횟수가 1 증가해야 함");
-
-		System.out.println("✅ 클릭 횟수 정상 증가");
+		System.out.println("✅ Redis에 클릭 횟수 정상 기록");
 	}
 
 	@Test
@@ -154,11 +169,11 @@ class RedirectIntegrationTest {
 		UrlMapping saved = urlMappingRepository.findAll().get(0);
 		String shortUrl = saved.getShortUrl();
 		String shortCode = shortUrl.substring(shortUrl.lastIndexOf("/") + 1);
-		Long initialClickCount = saved.getClickCount();
+		Long scrambledId = saved.getScrambledId();
 		int clickTimes = 5;
 
 		System.out.println("=== 여러 번 클릭 테스트 ===");
-		System.out.println("초기 클릭 횟수: " + initialClickCount);
+		System.out.println("ScrambledId: " + scrambledId);
 		System.out.println("요청 횟수: " + clickTimes + "번");
 
 		// When: 여러 번 리다이렉트 호출
@@ -170,16 +185,14 @@ class RedirectIntegrationTest {
 		// 비동기 처리 대기
 		Thread.sleep(2000);
 
-		// Then: DB에서 클릭 횟수 확인
-		UrlMapping updated = urlMappingRepository.findById(saved.getId())
-			.orElseThrow(() -> new AssertionError("엔티티를 찾을 수 없음"));
+		// Then: Redis에서 클릭 횟수 확인
+		Long redisClickCount = getClickCountFromRedis(scrambledId);
+		System.out.println("업데이트된 Redis 클릭 횟수: " + redisClickCount);
 
-		System.out.println("업데이트된 클릭 횟수: " + updated.getClickCount());
+		assertEquals((long) clickTimes, redisClickCount,
+			"Redis에 클릭 횟수가 " + clickTimes + "번으로 기록되어야 함");
 
-		assertEquals(initialClickCount + clickTimes, updated.getClickCount(),
-			"클릭 횟수가 " + clickTimes + "번 증가해야 함");
-
-		System.out.println("✅ 클릭 횟수 정상 누적 (" + clickTimes + "번)");
+		System.out.println("✅ Redis에 클릭 횟수 정상 누적 (" + clickTimes + "번)");
 	}
 
 	@Test
@@ -213,11 +226,11 @@ class RedirectIntegrationTest {
 		UrlMapping saved = urlMappingRepository.findAll().get(0);
 		String shortUrl = saved.getShortUrl();
 		String shortCode = shortUrl.substring(shortUrl.lastIndexOf("/") + 1);
-		Long initialClickCount = saved.getClickCount();
+		Long scrambledId = saved.getScrambledId();
 		int concurrentRequests = 10;
 
 		System.out.println("=== 동시 요청 레이스 컨디션 테스트 ===");
-		System.out.println("초기 클릭 횟수: " + initialClickCount);
+		System.out.println("ScrambledId: " + scrambledId);
 		System.out.println("동시 요청 횟수: " + concurrentRequests + "번");
 
 		// When: 동시에 여러 요청 (병렬 처리)
@@ -242,16 +255,14 @@ class RedirectIntegrationTest {
 		// 비동기 처리 대기
 		Thread.sleep(3000);
 
-		// Then: 정확히 concurrentRequests만큼 증가했는지 확인
-		UrlMapping updated = urlMappingRepository.findById(saved.getId())
-			.orElseThrow(() -> new AssertionError("엔티티를 찾을 수 없음"));
+		// Then: Redis에서 클릭 횟수 확인 (Redis는 atomic 연산 보장)
+		Long redisClickCount = getClickCountFromRedis(scrambledId);
+		System.out.println("업데이트된 Redis 클릭 횟수: " + redisClickCount);
+		System.out.println("예상 클릭 횟수: " + concurrentRequests);
 
-		System.out.println("업데이트된 클릭 횟수: " + updated.getClickCount());
-		System.out.println("예상 클릭 횟수: " + (initialClickCount + concurrentRequests));
+		assertEquals((long) concurrentRequests, redisClickCount,
+			"동시 요청 시에도 Redis에 클릭 횟수가 정확히 " + concurrentRequests + "번 기록되어야 함 (레이스 컨디션 없음)");
 
-		assertEquals(initialClickCount + concurrentRequests, updated.getClickCount(),
-			"동시 요청 시에도 클릭 횟수가 정확히 " + concurrentRequests + "번 증가해야 함");
-
-		System.out.println("✅ 레이스 컨디션 없음 - 클릭 횟수 정확");
+		System.out.println("✅ 레이스 컨디션 없음 - Redis 클릭 횟수 정확");
 	}
 }
