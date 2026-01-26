@@ -9,7 +9,9 @@ import org.springframework.stereotype.Component;
 import luti.server.application.command.UrlAnalyticsCommand;
 import luti.server.application.result.UrlAnalyticsResult;
 import luti.server.domain.service.ClickStatisticsService;
+import luti.server.domain.service.UrlAnalyticsService;
 import luti.server.domain.service.dto.RecentDailyStatisticsInfo;
+import luti.server.domain.service.dto.UrlAnalyticsInfo;
 import luti.server.exception.BusinessException;
 import luti.server.exception.ErrorCode;
 import luti.server.application.command.ClaimUrlCommand;
@@ -32,12 +34,14 @@ public class MyUrlsFacade {
 	private final UrlValidationChainBuilder chainBuilder;
 	private final MyUrlService myUrlService;
 	private final ClickStatisticsService clickStatisticsService;
+	private final UrlAnalyticsService urlAnalyticsService;
 
 	public MyUrlsFacade(UrlValidationChainBuilder chainBuilder, MyUrlService myUrlService,
-						ClickStatisticsService clickStatisticsService) {
+						ClickStatisticsService clickStatisticsService, UrlAnalyticsService urlAnalyticsService) {
 		this.chainBuilder = chainBuilder;
 		this.myUrlService = myUrlService;
 		this.clickStatisticsService = clickStatisticsService;
+		this.urlAnalyticsService = urlAnalyticsService;
 	}
 
 	public UrlVerifyResult verify(String shortUrl) {
