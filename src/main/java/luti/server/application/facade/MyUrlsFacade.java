@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import luti.server.application.command.UrlAnalyticsCommand;
+import luti.server.application.result.UrlAnalyticsResult;
 import luti.server.domain.service.ClickStatisticsService;
 import luti.server.domain.service.dto.RecentDailyStatisticsInfo;
 import luti.server.exception.BusinessException;
@@ -92,4 +94,14 @@ public class MyUrlsFacade {
 
 		myUrlService.deleteUrlMapping(command.getUrlId(), command.getMemberId());
 	}
+
+	public UrlAnalyticsResult getUrlAnalytics(UrlAnalyticsCommand command) {
+
+		log.info("URL 통계 조회 요청: urlMappingId={}, memberId={}", command.getUrlMappingId(), command.getMemberId());
+
+		UrlAnalyticsInfo analyticsInfo = urlAnalyticsService.getAnalytics(command.getUrlMappingId(), command.getMemberId());
+
+		return UrlAnalyticsResult.from(analyticsInfo);
+	}
+
 }

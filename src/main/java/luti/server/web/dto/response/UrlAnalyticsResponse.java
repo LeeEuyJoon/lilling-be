@@ -15,10 +15,10 @@ public class UrlAnalyticsResponse {
 
 	public static UrlAnalyticsResponse from(UrlAnalyticsResult result) {
 		UrlAnalyticsResponse response = new UrlAnalyticsResponse();
-		response.hourly = TimeSeriesData.fromHourly(result.getHourlyResult());
-		response.daily = TimeSeriesData.fromDaily(result.getDailyResult());
-		response.weekly = TimeSeriesData.fromWeekly(result.getWeeklyResult());
-		response.monthly = TimeSeriesData.fromMonthly(result.getMonthlyResult());
+		response.hourly = TimeSeriesData.fromHourly(result.getHourlyStats());
+		response.daily = TimeSeriesData.fromDaily(result.getDailyStats());
+		response.weekly = TimeSeriesData.fromWeekly(result.getWeeklyStats());
+		response.monthly = TimeSeriesData.fromMonthly(result.getMonthlyStats());
 		return response;
 	}
 
@@ -26,7 +26,7 @@ public class UrlAnalyticsResponse {
 		private String range;
 		private List<?> data;
 
-		public static TimeSeriesData fromHourly(List<UrlAnalyticsResult.HourlyResult> stats) {
+		public static TimeSeriesData fromHourly(List<UrlAnalyticsResult.HourlyStatResult> stats) {
 			TimeSeriesData timeSeriesData = new TimeSeriesData();
 			timeSeriesData.range = "24h";
 			timeSeriesData.data = stats.stream()
@@ -38,7 +38,7 @@ public class UrlAnalyticsResponse {
 			return timeSeriesData;
 		}
 
-		public static TimeSeriesData fromDaily(List<UrlAnalyticsResult.DailyResult> stats) {
+		public static TimeSeriesData fromDaily(List<UrlAnalyticsResult.DailyStatResult> stats) {
 			TimeSeriesData timeSeriesData = new TimeSeriesData();
 			timeSeriesData.range = "30d";
 			timeSeriesData.data = stats.stream()
@@ -50,7 +50,7 @@ public class UrlAnalyticsResponse {
 			return timeSeriesData;
 		}
 
-		public static TimeSeriesData fromWeekly(List<UrlAnalyticsResult.WeeklyResult> stats) {
+		public static TimeSeriesData fromWeekly(List<UrlAnalyticsResult.WeeklyStatResult> stats) {
 			TimeSeriesData timeSeriesData = new TimeSeriesData();
 			timeSeriesData.range = "12w";
 			timeSeriesData.data = stats.stream()
@@ -62,7 +62,7 @@ public class UrlAnalyticsResponse {
 			return timeSeriesData;
 		}
 
-		public static TimeSeriesData fromMonthly(List<UrlAnalyticsResult.MonthlyResult> stats) {
+		public static TimeSeriesData fromMonthly(List<UrlAnalyticsResult.MonthlyStatResult> stats) {
 			TimeSeriesData timeSeriesData = new TimeSeriesData();
 			timeSeriesData.range = "12m";
 			timeSeriesData.data = stats.stream()
