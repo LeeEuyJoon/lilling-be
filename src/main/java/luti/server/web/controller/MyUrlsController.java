@@ -20,6 +20,7 @@ import luti.server.application.command.MyUrlsCommand;
 import luti.server.application.result.MyUrlsListResult;
 import luti.server.application.result.UrlVerifyResult;
 import luti.server.web.dto.request.DescriptionRequest;
+import luti.server.web.dto.response.UrlAnalyticsResponse;
 import luti.server.web.mapper.DeleteUrlCommandMapper;
 import luti.server.web.mapper.DescriptionCommandMapper;
 import luti.server.web.mapper.MyUrlsCommandMapper;
@@ -27,6 +28,7 @@ import luti.server.web.dto.request.ClaimRequest;
 import luti.server.web.dto.response.MyUrlsListResponse;
 import luti.server.web.dto.response.VerifyUrlResponse;
 import luti.server.web.mapper.ClaimUrlCommandMapper;
+import luti.server.web.mapper.UrlAnalyticsCommandMapper;
 
 @RestController
 @RequestMapping("/api/v1/my-urls")
@@ -69,7 +71,8 @@ public class MyUrlsController {
 	}
 
 	@PatchMapping("/description")
-	public ResponseEntity<Void> updateDescription(@RequestBody DescriptionRequest request, Authentication authentication) {
+	public ResponseEntity<Void> updateDescription(@RequestBody DescriptionRequest request,
+												  Authentication authentication) {
 
 		DescriptionCommand command = DescriptionCommandMapper.toCommand(request, authentication);
 		myUrlsFacade.updateDescription(command);
@@ -84,5 +87,16 @@ public class MyUrlsController {
 		myUrlsFacade.deleteUrl(command);
 
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/{urlId}/analytics")
+	public ResponseEntity<UrlAnalyticsResponse> getUrlAnalytics(
+		@PathVariable Long urlId, Authentication authentication) {
+
+		UrlAnalyticsCommand command = UrlAnalyticsCommandMapper.toCommand(urlId, authentication);
+		UrlAnalyticsResult result = myUrlsFacade.getUrlAnalytics(command);
+		UrlAnalyticsResponse response = UrlAnalyticsResponse.from(result);
+
+		return ResponseEntity.ok(response);
 	}
 }
