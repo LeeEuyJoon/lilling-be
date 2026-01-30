@@ -83,7 +83,7 @@ public class MyUrlsController {
 	}
 
 	@DeleteMapping("/{urlId}")
-	public ResponseEntity<Void> deleteUrl(@PathVariable Long urlId, Authentication authentication) {
+	public ResponseEntity<Void> deleteUrl(@PathVariable("urlId") Long urlId, Authentication authentication) {
 
 		DeleteUrlCommand command = DeleteUrlCommandMapper.toCommand(urlId, authentication);
 		myUrlsFacade.deleteUrl(command);
@@ -92,8 +92,7 @@ public class MyUrlsController {
 	}
 
 	@GetMapping("/{urlId}/analytics")
-	public ResponseEntity<UrlAnalyticsResponse> getUrlAnalytics(
-		@PathVariable Long urlId, Authentication authentication) {
+	public ResponseEntity<UrlAnalyticsResponse> getUrlAnalytics(@PathVariable("urlId") Long urlId, Authentication authentication) {
 
 		UrlAnalyticsCommand command = UrlAnalyticsCommandMapper.toCommand(urlId, authentication);
 		UrlAnalyticsResult result = myUrlsFacade.getUrlAnalytics(command);

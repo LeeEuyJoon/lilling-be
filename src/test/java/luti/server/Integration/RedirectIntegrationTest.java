@@ -58,8 +58,8 @@ class RedirectIntegrationTest {
 		// JWT 설정
 		registry.add("JWT_SECRET_KEY", () -> "test-secret-key-for-jwt-signing-at-least-32-characters-long");
 		registry.add("JWT_ACCESS_TTL_SECONDS", () -> "3600");
-		registry.add("JWT_ISSUER", () -> "https://api.lill.ing");
-		registry.add("JWT_AUDIENCE", () -> "api.lill.ing");
+		registry.add("JWT_ISSUER", () -> "https://test.lill.ing");
+		registry.add("JWT_AUDIENCE", () -> "test.lill.ing");
 	}
 
 	@Autowired
