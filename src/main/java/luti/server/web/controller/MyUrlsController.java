@@ -18,6 +18,8 @@ import luti.server.application.command.ClaimUrlCommand;
 import luti.server.application.command.DeleteUrlCommand;
 import luti.server.application.command.DescriptionCommand;
 import luti.server.application.command.MyUrlsCommand;
+import luti.server.application.facade.UrlAnalyticsFacade;
+import luti.server.application.facade.UrlManagementFacade;
 import luti.server.application.result.MyUrlsListResult;
 import luti.server.application.result.UrlAnalyticsResult;
 import luti.server.application.result.UrlVerifyResult;
@@ -36,16 +38,18 @@ import luti.server.web.mapper.UrlAnalyticsCommandMapper;
 @RequestMapping("/api/v1/my-urls")
 public class MyUrlsController {
 
-	private final MyUrlsFacade myUrlsFacade;
+	private final UrlManagementFacade urlManagementFacade;
+	private final UrlAnalyticsFacade urlAnalyticsFacade;
 
-	public MyUrlsController(MyUrlsFacade myUrlsFacade) {
-		this.myUrlsFacade = myUrlsFacade;
+	public MyUrlsController(UrlManagementFacade urlManagementFacade, UrlAnalyticsFacade urlAnalyticsFacade) {
+		this.urlManagementFacade = urlManagementFacade;
+		this.urlAnalyticsFacade = urlAnalyticsFacade;
 	}
 
 	@GetMapping("/verify")
 	public ResponseEntity<VerifyUrlResponse> verify(@RequestParam("shortUrl") String shortUrl) {
 
-		UrlVerifyResult verifyResult = myUrlsFacade.verify(shortUrl);
+		UrlVerifyResult verifyResult = urlManagementFacade.verify(shortUrl);
 		VerifyUrlResponse response = VerifyUrlResponse.from(verifyResult);
 
 		return ResponseEntity.ok(response);
@@ -55,7 +59,7 @@ public class MyUrlsController {
 	public ResponseEntity<Void> claimUrl(@RequestBody ClaimRequest request, Authentication authentication) {
 
 		ClaimUrlCommand command = ClaimUrlCommandMapper.toCommand(request, authentication);
-		myUrlsFacade.claimUrl(command);
+		urlManagementFacade.claimUrl(command);
 
 		return ResponseEntity.noContent().build();
 	}
@@ -66,7 +70,7 @@ public class MyUrlsController {
 														Authentication authentication) {
 
 		MyUrlsCommand command = MyUrlsCommandMapper.toCommand(page, size, authentication);
-		MyUrlsListResult result = myUrlsFacade.getMyUrls(command);
+		MyUrlsListResult result = urlAnalyticsFacade.getMyUrls(command);
 		MyUrlsListResponse response = MyUrlsListResponse.from(result);
 
 		return ResponseEntity.ok(response);
@@ -77,7 +81,7 @@ public class MyUrlsController {
 												  Authentication authentication) {
 
 		DescriptionCommand command = DescriptionCommandMapper.toCommand(request, authentication);
-		myUrlsFacade.updateDescription(command);
+		urlManagementFacade.updateDescription(command);
 
 		return ResponseEntity.noContent().build();
 	}
@@ -86,7 +90,7 @@ public class MyUrlsController {
 	public ResponseEntity<Void> deleteUrl(@PathVariable("urlId") Long urlId, Authentication authentication) {
 
 		DeleteUrlCommand command = DeleteUrlCommandMapper.toCommand(urlId, authentication);
-		myUrlsFacade.deleteUrl(command);
+		urlManagementFacade.deleteUrl(command);
 
 		return ResponseEntity.noContent().build();
 	}
@@ -95,7 +99,7 @@ public class MyUrlsController {
 	public ResponseEntity<UrlAnalyticsResponse> getUrlAnalytics(@PathVariable("urlId") Long urlId, Authentication authentication) {
 
 		UrlAnalyticsCommand command = UrlAnalyticsCommandMapper.toCommand(urlId, authentication);
-		UrlAnalyticsResult result = myUrlsFacade.getUrlAnalytics(command);
+		UrlAnalyticsResult result = urlAnalyticsFacade.getUrlAnalytics(command);
 		UrlAnalyticsResponse response = UrlAnalyticsResponse.from(result);
 
 		return ResponseEntity.ok(response);
