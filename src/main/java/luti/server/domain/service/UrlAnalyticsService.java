@@ -1,205 +1,93 @@
 package luti.server.domain.service;
 
-import static java.time.temporal.ChronoUnit.*;
 import static luti.server.exception.ErrorCode.*;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import luti.server.domain.aggregator.DailyStatisticsAggregator;
+import luti.server.domain.aggregator.HourlyStatisticsAggregator;
+import luti.server.domain.aggregator.MonthlyStatisticsAggregator;
+import luti.server.domain.aggregator.WeeklyStatisticsAggregator;
 import luti.server.domain.model.ClickCountHistory;
 import luti.server.domain.model.UrlMapping;
 import luti.server.domain.port.ClickCountHistoryReader;
 import luti.server.domain.port.UrlMappingReader;
 import luti.server.domain.service.dto.UrlAnalyticsInfo;
+import luti.server.domain.validator.UrlOwnershipValidator;
 import luti.server.exception.BusinessException;
 
+/**
+ * URL 분석 서비스
+ * URL의 클릭 통계 데이터를 조회하고 오케스트레이션하는 책임을 가진 서비스
+ * 실제 집계 로직은 각 Aggregator에게 위임하여 SRP 준수
+ */
 @Service
 @Transactional(readOnly = true)
 public class UrlAnalyticsService {
 
-	private static final int HOURLY_RANGE_HOURS = 24;
-	private static final int DAILY_RANGE_DAYS = 30;
-	private static final int WEEKLY_RANGE_WEEKS = 12;
 	private static final int MONTHLY_RANGE_MONTHS = 12;
 
 	private final UrlMappingReader urlMappingReader;
 	private final ClickCountHistoryReader clickCountHistoryReader;
+	private final UrlOwnershipValidator ownershipValidator;
+	private final HourlyStatisticsAggregator hourlyAggregator;
+	private final DailyStatisticsAggregator dailyAggregator;
+	private final WeeklyStatisticsAggregator weeklyAggregator;
+	private final MonthlyStatisticsAggregator monthlyAggregator;
 
-	public UrlAnalyticsService(UrlMappingReader urlMappingReader, ClickCountHistoryReader clickCountHistoryReader) {
+	public UrlAnalyticsService(
+		UrlMappingReader urlMappingReader,
+		ClickCountHistoryReader clickCountHistoryReader,
+		UrlOwnershipValidator ownershipValidator,
+		HourlyStatisticsAggregator hourlyAggregator,
+		DailyStatisticsAggregator dailyAggregator,
+		WeeklyStatisticsAggregator weeklyAggregator,
+		MonthlyStatisticsAggregator monthlyAggregator
+	) {
 		this.urlMappingReader = urlMappingReader;
 		this.clickCountHistoryReader = clickCountHistoryReader;
+		this.ownershipValidator = ownershipValidator;
+		this.hourlyAggregator = hourlyAggregator;
+		this.dailyAggregator = dailyAggregator;
+		this.weeklyAggregator = weeklyAggregator;
+		this.monthlyAggregator = monthlyAggregator;
 	}
 
 	/**
 	 * URL 분석 정보 조회
-	 * @param urlMappingId
-	 * @param memberId
-	 * @return UrlAnalyticsInfo
+	 * 소유권 검증 후 각 시간대별 집계자에게 위임하여 통계 데이터를 생성
+	 *
+	 * @param urlMappingId URL 매핑 ID
+	 * @param memberId 회원 ID
+	 * @return UrlAnalyticsInfo 시간대별 통계 데이터
 	 */
 	public UrlAnalyticsInfo getAnalytics(Long urlMappingId, Long memberId) {
 
+		// URL 조회
 		UrlMapping urlMapping = urlMappingReader.findById(urlMappingId)
 												.orElseThrow(() -> new BusinessException(URL_NOT_FOUND));
 
-		if (urlMapping.getMember() == null || !urlMapping.getMember().getId().equals(memberId)) {
-			throw new BusinessException(NOT_URL_OWNER);
-		}
+		// 소유권 검증 (위임)
+		ownershipValidator.validateOwnership(urlMapping, memberId);
 
+		// 히스토리 조회 (최근 12개월)
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime since = now.minusMonths(MONTHLY_RANGE_MONTHS).withDayOfMonth(1).toLocalDate().atStartOfDay();
 
 		List<ClickCountHistory> histories = clickCountHistoryReader
 			.findByUrlMappingAndHourGreaterThanEqual(urlMapping, since);
 
-		List<UrlAnalyticsInfo.HourlyStat> hourlyStats = aggregateHourly(histories, now);
-		List<UrlAnalyticsInfo.DailyStat> dailyStats = aggregateDaily(histories, now);
-		List<UrlAnalyticsInfo.WeeklyStat> weeklyStats = aggregateWeekly(histories, now);
-		List<UrlAnalyticsInfo.MonthlyStat> monthlyStats = aggregateMonthly(histories, now);
+		// 각 aggregator에게 위임하여 통계 생성
+		List<UrlAnalyticsInfo.HourlyStat> hourlyStats = hourlyAggregator.aggregate(histories, now);
+		List<UrlAnalyticsInfo.DailyStat> dailyStats = dailyAggregator.aggregate(histories, now);
+		List<UrlAnalyticsInfo.WeeklyStat> weeklyStats = weeklyAggregator.aggregate(histories, now);
+		List<UrlAnalyticsInfo.MonthlyStat> monthlyStats = monthlyAggregator.aggregate(histories, now);
 
 		return UrlAnalyticsInfo.of(hourlyStats, dailyStats, weeklyStats, monthlyStats);
 	}
 
-	/**
-	 * 시간별 통계 집계
-	 * @param histories
-	 * @param now
-	 * @return List<UrlAnalyticsInfo.HourlyStat>
-	 */
-	private List<UrlAnalyticsInfo.HourlyStat> aggregateHourly(List<ClickCountHistory> histories, LocalDateTime now) {
-
-		// since 계산 (시간별 통계 집계는 현재 시각에서 24시간 전의 데이터부터 집계)
-		LocalDateTime since = now.minusHours(HOURLY_RANGE_HOURS - 1).truncatedTo(HOURS);
-
-		// since 이후의 클릭 히스토리를 시간 단위로 묶어서 Map 생성
-		Map<LocalDateTime, Long> hourlyMap = histories.stream()
-													  .filter(h -> !h.getHour().isBefore(since))
-													  .collect(Collectors.groupingBy(
-														  ClickCountHistory::getHour,
-														  Collectors.summingLong(ClickCountHistory::getClickCount)
-													  ));
-
-		// 빈 데이터 0으로 채우기
-		List<UrlAnalyticsInfo.HourlyStat> result = new ArrayList<>();
-		LocalDateTime current = since;
-		LocalDateTime end = now.truncatedTo(HOURS);
-
-		while (!current.isAfter(end)) {
-			Long count = hourlyMap.getOrDefault(current, 0L);
-			result.add(UrlAnalyticsInfo.HourlyStat.of(current, count));
-			current = current.plusHours(1);
-		}
-
-		return result;
-	}
-
-	/**
-	 * 일별 통계 집계
-	 * @param histories
-	 * @param now
-	 * @return
-	 */
-	private List<UrlAnalyticsInfo.DailyStat> aggregateDaily(List<ClickCountHistory> histories, LocalDateTime now) {
-
-		// today, since 계산
-		LocalDate today = now.toLocalDate();
-		LocalDate since = today.minusDays(DAILY_RANGE_DAYS - 1);
-
-		// since 이후의 클릭 히스토리를 일 단위로 묶어서 Map 생성
-		Map<LocalDate, Long> dailyMap = histories.stream()
-												 .filter(h -> !h.getHour().toLocalDate().isBefore(since))
-												 .collect(Collectors.groupingBy(
-													 h -> h.getHour().toLocalDate(),
-													 Collectors.summingLong(ClickCountHistory::getClickCount)
-												 ));
-
-		// 빈 데이터 0으로 채우기
-		List<UrlAnalyticsInfo.DailyStat> result = new ArrayList<>();
-		LocalDate current = since;
-
-		while (!current.isAfter(today)) {
-			Long count = dailyMap.getOrDefault(current, 0L);
-			result.add(UrlAnalyticsInfo.DailyStat.of(current, count));
-			current = current.plusDays(1);
-		}
-
-		return result;
-	}
-
-	/**
-	 * 주별 통계 집계
-	 * @param histories
-	 * @param now
-	 * @return
-	 */
-	private List<UrlAnalyticsInfo.WeeklyStat> aggregateWeekly(List<ClickCountHistory> histories, LocalDateTime now) {
-
-		// 이번 주 월요일과 since 계산
-		LocalDate currentWeekStart = now.toLocalDate()
-										.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-		LocalDate since = currentWeekStart.minusWeeks(WEEKLY_RANGE_WEEKS - 1);
-
-		// since 이후의 클릭 히스토리를 주 단위로 묶어서 Map 생성
-		Map<LocalDate, Long> weeklyMap = histories.stream()
-												  .filter(h -> !h.getHour().toLocalDate().isBefore(since))
-												  .collect(Collectors.groupingBy(
-													  h -> h.getHour().toLocalDate()
-															.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)),
-													  Collectors.summingLong(ClickCountHistory::getClickCount)
-												  ));
-
-		// 빈 데이터 0으로 채우기
-		List<UrlAnalyticsInfo.WeeklyStat> result = new ArrayList<>();
-		LocalDate current = since;
-
-		while (!current.isAfter(currentWeekStart)) {
-			Long count = weeklyMap.getOrDefault(current, 0L);
-			result.add(UrlAnalyticsInfo.WeeklyStat.of(current, count));
-			current = current.plusWeeks(1);
-		}
-
-		return result;
-	}
-
-	/**
-	 * 월별 통계 집계
-	 * @param histories
-	 * @param now
-	 * @return
-	 */
-	private List<UrlAnalyticsInfo.MonthlyStat> aggregateMonthly(List<ClickCountHistory> histories, LocalDateTime now) {
-
-		// 이번 달, since 계산
-		YearMonth currentMonth = YearMonth.from(now);
-		YearMonth since = currentMonth.minusMonths(MONTHLY_RANGE_MONTHS - 1);
-
-		// since 이후의 클릭 히스토리를 월 단위로 묶어서 Map 생성
-		Map<YearMonth, Long> monthlyMap = histories.stream()
-												   .filter(h -> !YearMonth.from(h.getHour()).isBefore(since))
-												   .collect(Collectors.groupingBy(
-													   h -> YearMonth.from(h.getHour()),
-													   Collectors.summingLong(ClickCountHistory::getClickCount)
-												   ));
-
-		// 빈 데이터 0으로 채우기
-		List<UrlAnalyticsInfo.MonthlyStat> result = new ArrayList<>();
-		YearMonth current = since;
-
-		while (!current.isAfter(currentMonth)) {
-			Long count = monthlyMap.getOrDefault(current, 0L);
-			result.add(UrlAnalyticsInfo.MonthlyStat.of(current.toString(), count));
-			current = current.plusMonths(1);
-		}
-
-		return result;
-	}
 }

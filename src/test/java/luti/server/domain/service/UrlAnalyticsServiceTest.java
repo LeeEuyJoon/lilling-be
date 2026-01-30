@@ -21,6 +21,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import luti.server.domain.aggregator.DailyStatisticsAggregator;
+import luti.server.domain.aggregator.HourlyStatisticsAggregator;
+import luti.server.domain.aggregator.MonthlyStatisticsAggregator;
+import luti.server.domain.aggregator.WeeklyStatisticsAggregator;
 import luti.server.domain.enums.Provider;
 import luti.server.domain.model.ClickCountHistory;
 import luti.server.domain.model.Member;
@@ -28,6 +32,7 @@ import luti.server.domain.model.UrlMapping;
 import luti.server.domain.port.ClickCountHistoryReader;
 import luti.server.domain.port.UrlMappingReader;
 import luti.server.domain.service.dto.UrlAnalyticsInfo;
+import luti.server.domain.validator.UrlOwnershipValidator;
 import luti.server.exception.BusinessException;
 import luti.server.exception.ErrorCode;
 
@@ -40,7 +45,6 @@ class UrlAnalyticsServiceTest {
 	@Mock
 	private ClickCountHistoryReader clickCountHistoryReader;
 
-	@InjectMocks
 	private UrlAnalyticsService urlAnalyticsService;
 
 	private Member testMember;
@@ -62,6 +66,24 @@ class UrlAnalyticsServiceTest {
 			.clickCount(100L)
 			.build();
 		setUrlMappingId(testUrlMapping, 1L);
+
+		// 실제 인스턴스 생성 (검증 로직과 집계 로직을 테스트하기 위해)
+		UrlOwnershipValidator ownershipValidator = new UrlOwnershipValidator();
+		HourlyStatisticsAggregator hourlyAggregator = new HourlyStatisticsAggregator();
+		DailyStatisticsAggregator dailyAggregator = new DailyStatisticsAggregator();
+		WeeklyStatisticsAggregator weeklyAggregator = new WeeklyStatisticsAggregator();
+		MonthlyStatisticsAggregator monthlyAggregator = new MonthlyStatisticsAggregator();
+
+		// UrlAnalyticsService 생성 (실제 인스턴스 주입)
+		urlAnalyticsService = new UrlAnalyticsService(
+			urlMappingReader,
+			clickCountHistoryReader,
+			ownershipValidator,
+			hourlyAggregator,
+			dailyAggregator,
+			weeklyAggregator,
+			monthlyAggregator
+		);
 	}
 
 	// Helper method to set private ID field via reflection
