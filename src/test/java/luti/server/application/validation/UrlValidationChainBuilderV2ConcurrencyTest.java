@@ -19,23 +19,23 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import luti.server.application.result.UrlVerifyResult;
-import luti.server.application.validation.UrlValidation.v1.UrlExistenceValidationHandler;
-import luti.server.application.validation.UrlValidation.v1.UrlFormatValidationHandler;
-import luti.server.application.validation.UrlValidation.v1.UrlOwnershipValidationHandler;
-import luti.server.application.validation.UrlValidation.v1.UrlValidationChainBuilder;
-import luti.server.application.validation.UrlValidation.v1.UrlValidationContext;
-import luti.server.application.validation.UrlValidation.v1.UrlValidationHandler;
+import luti.server.application.validation.UrlValidation.v2.UrlExistenceValidationHandler;
+import luti.server.application.validation.UrlValidation.v2.UrlFormatValidationHandler;
+import luti.server.application.validation.UrlValidation.v2.UrlOwnershipValidationHandler;
+import luti.server.application.validation.UrlValidation.v2.UrlValidationChainBuilder;
+import luti.server.application.validation.UrlValidation.v2.UrlValidationContext;
+import luti.server.application.validation.UrlValidation.v2.UrlValidator;
 import luti.server.domain.enums.VerifyUrlStatus;
 import luti.server.domain.service.UrlService;
 import luti.server.domain.service.dto.UrlMappingInfo;
 import luti.server.domain.util.Base62Encoder;
 
-class UrlValidationChainBuilderConcurrencyTest {
+class UrlValidationChainBuilderV2ConcurrencyTest {
 
 	private UrlValidationChainBuilder chainBuilder;
-	private UrlFormatValidationHandler formatValidator;
-	private UrlExistenceValidationHandler existenceValidator;
-	private UrlOwnershipValidationHandler ownershipValidator;
+	private UrlFormatValidationHandler formatHandler;
+	private UrlExistenceValidationHandler existenceHandler;
+	private UrlOwnershipValidationHandler ownershipHandler;
 
 	private UrlService urlService;
 	private Base62Encoder base62Encoder;
@@ -45,11 +45,11 @@ class UrlValidationChainBuilderConcurrencyTest {
 		urlService = mock(UrlService.class);
 		base62Encoder = mock(Base62Encoder.class);
 
-		formatValidator = new UrlFormatValidationHandler(urlService);
-		existenceValidator = new UrlExistenceValidationHandler(base62Encoder, urlService);
-		ownershipValidator = new UrlOwnershipValidationHandler();
+		formatHandler = new UrlFormatValidationHandler(urlService);
+		existenceHandler = new UrlExistenceValidationHandler(base62Encoder, urlService);
+		ownershipHandler = new UrlOwnershipValidationHandler();
 
-		chainBuilder = new UrlValidationChainBuilder(formatValidator, existenceValidator, ownershipValidator);
+		chainBuilder = new UrlValidationChainBuilder(formatHandler, existenceHandler, ownershipHandler);
 
 		when(urlService.verifyAndExtractShortCode(anyString()))
 			.thenReturn(Optional.of("abc123"));
@@ -63,7 +63,7 @@ class UrlValidationChainBuilderConcurrencyTest {
 	@DisplayName("단일 스레드 환경 - 정상 동작 확인")
 	void testSingleThread() {
 		UrlValidationContext context = new UrlValidationContext("https://short.url/abc123");
-		UrlValidationHandler chain = chainBuilder.buildVerifyChain();
+		UrlValidator chain = chainBuilder.buildVerifyChain();
 
 		UrlVerifyResult result = chain.validate(context);
 
@@ -72,8 +72,8 @@ class UrlValidationChainBuilderConcurrencyTest {
 
 
 	@RepeatedTest(10)
-	@DisplayName("멀티스레드 환경 - 소유권 검증 누락 확인")
-	void testOwnershipValidationSkipped() throws Exception {
+	@DisplayName("멀티스레드 환경 - V2는 소유권 검증 누락 없음 (Thread-Safe)")
+	void testOwnershipValidationThreadSafe() throws Exception {
 		int verifyThreads = 30;
 		int claimThreads = 30;
 		int totalThreads = verifyThreads + claimThreads;
@@ -95,7 +95,7 @@ class UrlValidationChainBuilderConcurrencyTest {
 			executorService.submit(() -> {
 				try {
 					UrlValidationContext context = new UrlValidationContext("https://short.url/abc123");
-					UrlValidationHandler chain = chainBuilder.buildVerifyChain();
+					UrlValidator chain = chainBuilder.buildVerifyChain();
 
 					barrier.await(); // 30개의 Verify 스레드와 30개의 Claim 스레드가 동시에 시작하도록 대기
 
@@ -105,7 +105,7 @@ class UrlValidationChainBuilderConcurrencyTest {
 						correctOwnershipCheck.incrementAndGet();
 					} else if (result.getStatus() == VerifyUrlStatus.OK) {
 						skippedOwnershipCheck.incrementAndGet();
-						System.err.println("Verify 체인에서 소유권 검증 누락 (OK 반환)");
+						System.err.println("V2: Verify 체인에서 소유권 검증 누락 (OK 반환) - 이것은 발생하면 안됨!");
 					}
 				} catch (Throwable e) {
 					synchronized (exceptions) {
@@ -117,13 +117,13 @@ class UrlValidationChainBuilderConcurrencyTest {
 			});
 		}
 
-		// Claim 스레드들 - 계속 체인을 null로 변경
+		// Claim 스레드들 - V2는 매번 새로운 체인 인스턴스 생성
 		for (int i = 0; i < claimThreads; i++) {
 			executorService.submit(() -> {
 				try {
 					barrier.await(); // 30개의 Verify 스레드와 30개의 Claim 스레드가 동시에 시작하도록 대기
 
-					// 반복적으로 Claim 체인 호출 → next를 null로 덮어씀
+					// 반복적으로 Claim 체인 호출 → V2는 매번 새 wrapper 생성하므로 다른 스레드에 영향 없음
 					for (int j = 0; j < 10; j++) {
 						chainBuilder.buildClaimChain();
 						Thread.sleep(1); // 타이밍 조정
@@ -141,15 +141,20 @@ class UrlValidationChainBuilderConcurrencyTest {
 		assertTrue(doneLatch.await(20, TimeUnit.SECONDS), "타임아웃");
 		executorService.shutdown();
 
-		System.out.println("=== 테스트 결과 ===");
+		System.out.println("=== V2 테스트 결과 ===");
 		System.out.println("소유권 검증 정상 수행: " + correctOwnershipCheck.get() + " / " + verifyThreads);
 		System.out.println("소유권 검증 누락 (race condition): " + skippedOwnershipCheck.get());
 		System.out.println("예외 발생: " + exceptions.size());
 
-		if (skippedOwnershipCheck.get() > 0) {
-			System.err.println("\n⚠️ Race condition 확인됨!");
-			System.err.println("Verify 체인 실행 중 Claim 체인 build가 next를 null로 덮어써서 소유권 검증 누락");
-			fail("Race condition 발생: " + skippedOwnershipCheck.get() + "개의 Verify 요청에서 소유권 검증 누락");
+		// V2는 thread-safe하므로 모든 Verify가 정상적으로 소유권 검증을 수행해야 함
+		assertEquals(verifyThreads, correctOwnershipCheck.get(),
+			"V2는 thread-safe하므로 모든 Verify 요청이 소유권 검증을 정상적으로 수행해야 함");
+		assertEquals(0, skippedOwnershipCheck.get(),
+			"V2는 thread-safe하므로 소유권 검증 누락이 발생하면 안됨");
+
+		if (skippedOwnershipCheck.get() == 0) {
+			System.out.println("\n✅ V2 Thread-Safe 확인!");
+			System.out.println("매번 새로운 wrapper 인스턴스를 생성하므로 다른 스레드에 영향을 주지 않음");
 		}
 	}
 

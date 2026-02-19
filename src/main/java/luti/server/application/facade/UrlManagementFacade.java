@@ -8,9 +8,9 @@ import luti.server.application.command.ClaimUrlCommand;
 import luti.server.application.command.DeleteUrlCommand;
 import luti.server.application.command.DescriptionCommand;
 import luti.server.application.result.UrlVerifyResult;
-import luti.server.application.validation.UrlValidationChainBuilder;
-import luti.server.application.validation.UrlValidationContext;
-import luti.server.application.validation.UrlValidationHandler;
+import luti.server.application.validation.UrlValidation.v2.UrlValidationChainBuilder;
+import luti.server.application.validation.UrlValidation.v2.UrlValidationContext;
+import luti.server.application.validation.UrlValidation.v2.UrlValidator;
 import luti.server.domain.service.MyUrlService;
 import luti.server.exception.BusinessException;
 import luti.server.exception.ErrorCode;
@@ -36,7 +36,7 @@ public class UrlManagementFacade {
 		log.info("단축 URL 추가 가능 검증 요청: shortUrl={}", shortUrl);
 
 		UrlValidationContext context = new UrlValidationContext(shortUrl);
-		UrlValidationHandler chain = chainBuilder.buildVerifyChain();
+		UrlValidator chain = chainBuilder.buildVerifyChain();
 
 		return chain.validate(context);
 	}
@@ -49,7 +49,7 @@ public class UrlManagementFacade {
 		log.info("단축 URL 클레임 요청: shortUrl={}, memberId={}", command.getShortUrl(), command.getMemberId());
 
 		UrlValidationContext context = new UrlValidationContext(command.getShortUrl());
-		UrlValidationHandler chain = chainBuilder.buildClaimChain();
+		UrlValidator chain = chainBuilder.buildClaimChain();
 
 		UrlVerifyResult result = chain.validate(context);
 

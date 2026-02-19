@@ -1,4 +1,4 @@
-package luti.server.application.validation;
+package luti.server.application.validation.UrlValidation.v2;
 
 import java.util.Optional;
 
@@ -15,7 +15,6 @@ public class UrlFormatValidationHandler implements UrlValidationHandler {
 	private static final Logger log = LoggerFactory.getLogger(UrlFormatValidationHandler.class);
 
 	private final UrlService urlService;
-	private UrlValidationHandler next;
 
 	public UrlFormatValidationHandler(UrlService urlService) {
 		this.urlService = urlService;
@@ -35,15 +34,6 @@ public class UrlFormatValidationHandler implements UrlValidationHandler {
 		context.setShortCode(shortCode.get());
 		log.debug("URL 형식 검증 성공: shortCode={}", shortCode.get());
 
-		if (next != null) {
-			return next.validate(context);
-		}
-
-		return UrlVerifyResult.ok(context.getUrlMappingInfo());
-	}
-
-	@Override
-	public void setNext(UrlValidationHandler next) {
-		this.next = next;
+		return null;
 	}
 }

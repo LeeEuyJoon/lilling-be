@@ -1,4 +1,4 @@
-package luti.server.application.validation;
+package luti.server.application.validation.UrlValidation.v2;
 
 import luti.server.domain.service.dto.UrlMappingInfo;
 

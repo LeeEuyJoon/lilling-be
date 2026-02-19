@@ -1,4 +1,4 @@
-package luti.server.application.validation;
+package luti.server.application.validation.UrlValidation.v1;
 
 import luti.server.application.result.UrlVerifyResult;
 

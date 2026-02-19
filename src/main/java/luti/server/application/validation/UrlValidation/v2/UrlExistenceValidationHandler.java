@@ -1,4 +1,4 @@
-package luti.server.application.validation;
+package luti.server.application.validation.UrlValidation.v2;
 
 import java.util.Optional;
 
@@ -18,7 +18,6 @@ public class UrlExistenceValidationHandler implements UrlValidationHandler {
 
 	private final Base62Encoder base62Encoder;
 	private final UrlService urlService;
-	private UrlValidationHandler next;
 
 	public UrlExistenceValidationHandler(Base62Encoder base62Encoder, UrlService urlService) {
 		this.base62Encoder = base62Encoder;
@@ -42,15 +41,6 @@ public class UrlExistenceValidationHandler implements UrlValidationHandler {
 		context.setUrlMappingInfo(urlInfo.get());
 		log.debug("URL 존재 여부 검증 성공: decodedId={}", decodedId);
 
-		if (next != null) {
-			return next.validate(context);
-		}
-
-		return UrlVerifyResult.ok(context.getUrlMappingInfo());
-	}
-
-	@Override
-	public void setNext(UrlValidationHandler next) {
-		this.next = next;
+		return null;
 	}
 }

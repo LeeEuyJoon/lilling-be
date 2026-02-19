@@ -1,13 +1,10 @@
-package luti.server.application.validation;
+package luti.server.application.validation.UrlValidation.v1;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
 import luti.server.application.result.UrlVerifyResult;
 import luti.server.domain.service.dto.UrlMappingInfo;
 
-@Component
 public class UrlOwnershipValidationHandler implements UrlValidationHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(UrlOwnershipValidationHandler.class);
