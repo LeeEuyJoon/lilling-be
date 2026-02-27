@@ -11,7 +11,7 @@ public class ShortenUrlCommandMapper {
 
 	public static ShortenUrlCommand toCommand(ShortenRequest request, Authentication authentication) {
 		Long memberId = extractMemberId(authentication);
-		return ShortenUrlCommand.of(memberId, request.getOriginalUrl());
+		return ShortenUrlCommand.of(memberId, request.getOriginalUrl(), request.getKeyword());
 	}
 
 }

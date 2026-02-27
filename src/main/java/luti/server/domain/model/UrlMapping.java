@@ -37,7 +37,7 @@ public class UrlMapping {
 	@Column(name = "kgs_id", nullable = false, updatable = false)
 	private Long kgsId;
 
-	@Column(name = "scrambled_id", nullable = false, updatable = false, unique = true)
+	@Column(name = "scrambled_id", nullable = true, updatable = false, unique = true)
 	private Long scrambledId;
 
 	@Column(name = "original_url", nullable = false, updatable = false, length = 2048)
