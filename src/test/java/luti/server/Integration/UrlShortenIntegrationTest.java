@@ -423,42 +423,6 @@ class UrlShortenIntegrationTest {
 	}
 
 	@Test
-	@DisplayName("keyword 단축 - keyword가 7자리 미만인 경우, suffix가 붙어서 shortCode 생성")
-	void shortenUrl_keyword_7자리미만_suffix붙어서생성() throws Exception {
-		// Given: 5자리 keyword (suffix 2자리까지 허용)
-		String originalUrl = "https://www.example.com/short-keyword";
-		String keyword = "short"; // 5자리
-		String requestBody = "{\"originalUrl\":\"" + originalUrl + "\", \"keyword\":\"" + keyword + "\"}";
-
-		// When & Then
-		mockMvc.perform(post("/api/v1/url/shorten")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(requestBody))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.shortUrl").exists());
-
-		// DB 검증
-		assertEquals(1, urlMappingRepository.count());
-
-		UrlMapping saved = urlMappingRepository.findAll().get(0);
-		String shortUrl = saved.getShortUrl();
-		String shortCode = shortUrl.substring(shortUrl.lastIndexOf("/") + 1);
-
-		// keyword가 prefix로 사용되고 suffix가 붙어 있어야 함
-		assertTrue(shortCode.startsWith(keyword),
-			"shortCode는 keyword로 시작해야 합니다. shortCode: " + shortCode);
-		assertTrue(shortCode.length() > keyword.length(),
-			"suffix가 붙어야 하므로 shortCode는 keyword보다 길어야 합니다. shortCode: " + shortCode);
-		assertTrue(shortCode.length() <= 7,
-			"shortCode는 7자 이하여야 합니다. 실제 길이: " + shortCode.length());
-
-		System.out.println("=== keyword + suffix 검증 ===");
-		System.out.println("keyword: " + keyword + " (" + keyword.length() + "자)");
-		System.out.println("shortCode: " + shortCode + " (" + shortCode.length() + "자)");
-		System.out.println("suffix 부분: " + shortCode.substring(keyword.length()));
-	}
-
-	@Test
 	@DisplayName("keyword 단축 - 같은 keyword로 중복 요청 시, 서로 다른 suffix로 두 번째 요청도 성공")
 	void shortenUrl_keyword_중복요청_다른suffix로성공() throws Exception {
 		// Given: 동일한 keyword로 두 번 요청

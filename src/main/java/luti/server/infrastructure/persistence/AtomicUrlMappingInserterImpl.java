@@ -3,6 +3,7 @@ package luti.server.infrastructure.persistence;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import luti.server.domain.model.UrlMapping;
 import luti.server.domain.port.AtomicUrlMappingInserter;
@@ -24,6 +25,7 @@ public class AtomicUrlMappingInserterImpl implements AtomicUrlMappingInserter {
 			urlMappingStore.saveAndFlush(urlMapping);
 			return true;
 		} catch (Exception e) {
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return false;
 		}
 	}
