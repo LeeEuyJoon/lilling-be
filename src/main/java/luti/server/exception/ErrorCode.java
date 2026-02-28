@@ -32,6 +32,7 @@ public enum ErrorCode {
 	UNSCRAMBLE_INPUT_NULL("3204", HttpStatus.BAD_REQUEST, "언스크램블링 입력값은 null일 수 없습니다"),
 	UNSCRAMBLE_INPUT_NEGATIVE("3205", HttpStatus.BAD_REQUEST, "언스크램블링 입력값은 음수일 수 없습니다"),
 	UNSCRAMBLE_INPUT_OVERFLOW("3206", HttpStatus.BAD_REQUEST, "언스크램블링 입력값이 허용 범위를 초과했습니다"),
+	INVALID_ORIGINAL_URL("3210", HttpStatus.BAD_REQUEST, "유효하지 않은 URL 형식입니다. http:// 또는 https://로 시작해야 합니다"),
 	INVALID_KEYWORD_FORMAT("3207", HttpStatus.BAD_REQUEST, "키워드 형식이 유효하지 않습니다"),
 	CANNOT_USE_KEYWORD("3208", HttpStatus.BAD_REQUEST, "해당 키워드로 더 이상 단축 URL을 생성할 수 없습니다"),
 	AUTO_SHORTEN_FAILED("3209", HttpStatus.INTERNAL_SERVER_ERROR, "URL 자동 생성에 실패했습니다. 잠시 후 다시 시도해주세요"),

@@ -99,6 +99,15 @@ public class UrlService {
 		throw new BusinessException(CANNOT_USE_KEYWORD);
 	}
 
+	public void validateOriginalUrl(String originalUrl) {
+		if (originalUrl == null || originalUrl.isBlank()) {
+			throw new BusinessException(INVALID_ORIGINAL_URL);
+		}
+		if (!originalUrl.startsWith("http://") && !originalUrl.startsWith("https://")) {
+			throw new BusinessException(INVALID_ORIGINAL_URL);
+		}
+	}
+
 	public Member resolveMember(Long memberId) {
 		return Optional.ofNullable(memberId)
 					   .flatMap(memberReader::findById)

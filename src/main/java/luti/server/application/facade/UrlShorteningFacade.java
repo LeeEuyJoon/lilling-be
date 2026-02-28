@@ -45,6 +45,8 @@ public class UrlShorteningFacade {
 
 		log.info("URL 단축 요청: originalUrl={}", command.getOriginalUrl());
 
+		urlService.validateOriginalUrl(command.getOriginalUrl());
+
 		boolean hasKeyword = command.getKeyword() != null && !command.getKeyword().isBlank();
 
 		String shortenedUrl = null;
