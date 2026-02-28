@@ -55,7 +55,7 @@ public class UrlService {
 	}
 
 	@Transactional
-	public String generateShortenedUrl(String originalUrl, Long nextId, Long scrambledId, String encodedValue,
+	public Optional<String> generateShortenedUrl(String originalUrl, Long nextId, Long scrambledId, String encodedValue,
 									   Long memberId) {
 		log.debug("URL 매핑 생성 시작: kgsId={}, scrambledId={}, shortCode={}", nextId, scrambledId, encodedValue);
 
@@ -72,10 +72,13 @@ public class UrlService {
 										  .member(member)
 										  .build();
 
-		urlMappingStore.save(urlMapping);
-		log.debug("URL 매핑 저장 성공: scrambledId={}, appId={}", scrambledId, APP_ID);
 
-		return urlMapping.getShortUrl();
+		if (atomicInserter.tryInsert(urlMapping)) {
+			log.debug("URL 매핑 저장 성공: scrambledId={}, appId={}", scrambledId, APP_ID);
+			return Optional.of(urlMapping.getShortUrl());
+		}
+
+		return Optional.empty();
 	}
 
 	@Transactional

@@ -1,9 +1,13 @@
 package luti.server.application.facade;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import luti.server.exception.BusinessException;
+import luti.server.exception.ErrorCode;
 import luti.server.infrastructure.client.kgs.KeyBlockManager;
 import luti.server.application.command.ShortenUrlCommand;
 import luti.server.application.result.ShortenUrlResult;
@@ -20,6 +24,8 @@ public class UrlShorteningFacade {
 	private final Base62Encoder base62Encoder;
 	private final KeyBlockManager keyBlockManager;
 	private final UrlService urlService;
+
+	private static final int MAX_AUTO_RETIRES = 20;
 
 	public UrlShorteningFacade(IdScrambler idScrambler, Base62Encoder base62Encoder, KeyBlockManager keyBlockManager,
 							   UrlService urlService) {
@@ -40,15 +46,31 @@ public class UrlShorteningFacade {
 
 		boolean hasKeyword = command.getKeyword() != null && !command.getKeyword().isBlank();
 
-		String shortenedUrl;
+		String shortenedUrl = null;
 
 		if (!hasKeyword) {
-			Long nextId = keyBlockManager.getNextId();
-			Long scrambledId = idScrambler.scramble(nextId);
-			String encodedValue = base62Encoder.encode(scrambledId);
-			shortenedUrl =
-				urlService.generateShortenedUrl(command.getOriginalUrl(), nextId, scrambledId, encodedValue,
-												command.getMemberId());
+
+			Long nextId = null;
+			String encodedValue = null;
+
+			for (int attempt = 0; attempt < MAX_AUTO_RETIRES; attempt++) {
+				nextId = keyBlockManager.getNextId();
+				Long scrambledId = idScrambler.scramble(nextId);
+				encodedValue = base62Encoder.encode(scrambledId);
+
+				Optional<String> result = urlService.generateShortenedUrl(command.getOriginalUrl(), nextId, scrambledId,
+																		  encodedValue, command.getMemberId());
+
+				if (result.isPresent()) {
+					shortenedUrl = result.get();
+					break;
+				}
+			}
+
+			if (shortenedUrl == null) {
+				log.error("URL 단축 실패: auto 로직에서 최대 재시도 횟수 초과");
+				throw new BusinessException(ErrorCode.AUTO_SHORTEN_FAILED);
+			}
 
 			log.info("URL 단축 성공 (auto): shortCode={}, kgsId={}, shortenedUrl={}", encodedValue, nextId, shortenedUrl);
 		} else {
