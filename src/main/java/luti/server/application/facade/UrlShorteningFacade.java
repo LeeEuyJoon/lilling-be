@@ -25,7 +25,7 @@ public class UrlShorteningFacade {
 	private final KeyBlockManager keyBlockManager;
 	private final UrlService urlService;
 
-	private static final int MAX_AUTO_RETIRES = 20;
+	private static final int MAX_AUTO_RETRIES = 20;
 
 	public UrlShorteningFacade(IdScrambler idScrambler, Base62Encoder base62Encoder, KeyBlockManager keyBlockManager,
 							   UrlService urlService) {
@@ -53,7 +53,7 @@ public class UrlShorteningFacade {
 			Long nextId = null;
 			String encodedValue = null;
 
-			for (int attempt = 0; attempt < MAX_AUTO_RETIRES; attempt++) {
+			for (int attempt = 0; attempt < MAX_AUTO_RETRIES; attempt++) {
 				nextId = keyBlockManager.getNextId();
 				Long scrambledId = idScrambler.scramble(nextId);
 				encodedValue = base62Encoder.encode(scrambledId);
