@@ -344,4 +344,325 @@ class UrlShortenIntegrationTest {
 		System.out.println("생성된 URL 개수: " + urlMappings.size());
 	}
 
+	// =====================================================================
+	// keyword 기반 URL 단축 통합 테스트
+	// =====================================================================
+
+	@Test
+	@DisplayName("keyword 단축 - 유효한 keyword로 단축 성공, shortUrl에 keyword가 포함되어야 함")
+	void shortenUrl_keyword_유효한keyword_단축성공() throws Exception {
+		// Given
+		String originalUrl = "https://www.example.com/keyword-test";
+		String keyword = "hello";
+		String requestBody = "{\"originalUrl\":\"" + originalUrl + "\", \"keyword\":\"" + keyword + "\"}";
+
+		// When & Then
+		String responseContent = mockMvc.perform(post("/api/v1/url/shorten")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.shortUrl").exists())
+			.andExpect(jsonPath("$.shortUrl").isString())
+			.andReturn()
+			.getResponse()
+			.getContentAsString();
+
+		// DB 검증
+		assertEquals(1, urlMappingRepository.count());
+
+		UrlMapping saved = urlMappingRepository.findAll().get(0);
+		String shortUrl = saved.getShortUrl();
+		String shortCode = shortUrl.substring(shortUrl.lastIndexOf("/") + 1);
+
+		// keyword가 shortCode의 prefix로 사용되었는지 검증
+		assertTrue(shortCode.startsWith(keyword),
+			"shortCode는 keyword로 시작해야 합니다. shortCode: " + shortCode + ", keyword: " + keyword);
+		assertEquals(originalUrl, saved.getOriginalUrl());
+		assertEquals("test-app", saved.getAppId());
+
+		System.out.println("=== keyword 단축 성공 결과 ===");
+		System.out.println("keyword: " + keyword);
+		System.out.println("shortCode: " + shortCode);
+		System.out.println("shortUrl: " + shortUrl);
+		System.out.println("originalUrl: " + saved.getOriginalUrl());
+		System.out.println("응답 JSON: " + responseContent);
+	}
+
+	@Test
+	@DisplayName("keyword 단축 - keyword가 정확히 7자리인 경우, keyword 자체가 shortCode가 되어야 함")
+	void shortenUrl_keyword_7자리_keyword가shortCode가됨() throws Exception {
+		// Given: 7자리 Base62 keyword
+		String originalUrl = "https://www.example.com/seven-char-keyword";
+		String keyword = "abcdefg"; // 정확히 7자리
+		String requestBody = "{\"originalUrl\":\"" + originalUrl + "\", \"keyword\":\"" + keyword + "\"}";
+
+		// When & Then
+		mockMvc.perform(post("/api/v1/url/shorten")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.shortUrl").exists());
+
+		// DB 검증
+		assertEquals(1, urlMappingRepository.count());
+
+		UrlMapping saved = urlMappingRepository.findAll().get(0);
+		String shortUrl = saved.getShortUrl();
+		String shortCode = shortUrl.substring(shortUrl.lastIndexOf("/") + 1);
+
+		// 7자리 keyword는 그 자체가 shortCode이어야 함
+		assertEquals(keyword, shortCode,
+			"7자리 keyword는 그대로 shortCode로 사용되어야 합니다. 실제 shortCode: " + shortCode);
+		assertEquals(7, shortCode.length(), "shortCode 길이는 7이어야 합니다.");
+
+		System.out.println("=== 7자리 keyword shortCode 검증 ===");
+		System.out.println("keyword: " + keyword);
+		System.out.println("shortCode: " + shortCode);
+		System.out.println("shortCode 길이: " + shortCode.length());
+		System.out.println("keyword == shortCode: " + keyword.equals(shortCode));
+	}
+
+	@Test
+	@DisplayName("keyword 단축 - keyword가 7자리 미만인 경우, suffix가 붙어서 shortCode 생성")
+	void shortenUrl_keyword_7자리미만_suffix붙어서생성() throws Exception {
+		// Given: 5자리 keyword (suffix 2자리까지 허용)
+		String originalUrl = "https://www.example.com/short-keyword";
+		String keyword = "short"; // 5자리
+		String requestBody = "{\"originalUrl\":\"" + originalUrl + "\", \"keyword\":\"" + keyword + "\"}";
+
+		// When & Then
+		mockMvc.perform(post("/api/v1/url/shorten")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.shortUrl").exists());
+
+		// DB 검증
+		assertEquals(1, urlMappingRepository.count());
+
+		UrlMapping saved = urlMappingRepository.findAll().get(0);
+		String shortUrl = saved.getShortUrl();
+		String shortCode = shortUrl.substring(shortUrl.lastIndexOf("/") + 1);
+
+		// keyword가 prefix로 사용되고 suffix가 붙어 있어야 함
+		assertTrue(shortCode.startsWith(keyword),
+			"shortCode는 keyword로 시작해야 합니다. shortCode: " + shortCode);
+		assertTrue(shortCode.length() > keyword.length(),
+			"suffix가 붙어야 하므로 shortCode는 keyword보다 길어야 합니다. shortCode: " + shortCode);
+		assertTrue(shortCode.length() <= 7,
+			"shortCode는 7자 이하여야 합니다. 실제 길이: " + shortCode.length());
+
+		System.out.println("=== keyword + suffix 검증 ===");
+		System.out.println("keyword: " + keyword + " (" + keyword.length() + "자)");
+		System.out.println("shortCode: " + shortCode + " (" + shortCode.length() + "자)");
+		System.out.println("suffix 부분: " + shortCode.substring(keyword.length()));
+	}
+
+	@Test
+	@DisplayName("keyword 단축 - 같은 keyword로 중복 요청 시, 서로 다른 suffix로 두 번째 요청도 성공")
+	void shortenUrl_keyword_중복요청_다른suffix로성공() throws Exception {
+		// Given: 동일한 keyword로 두 번 요청
+		String originalUrl1 = "https://www.example.com/duplicate-keyword-first";
+		String originalUrl2 = "https://www.example.com/duplicate-keyword-second";
+		String keyword = "dup"; // 3자리 (suffix 최대 4자리)
+
+		String requestBody1 = "{\"originalUrl\":\"" + originalUrl1 + "\", \"keyword\":\"" + keyword + "\"}";
+		String requestBody2 = "{\"originalUrl\":\"" + originalUrl2 + "\", \"keyword\":\"" + keyword + "\"}";
+
+		// When: 첫 번째 요청
+		mockMvc.perform(post("/api/v1/url/shorten")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody1))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.shortUrl").exists());
+
+		// When: 두 번째 요청 (같은 keyword)
+		mockMvc.perform(post("/api/v1/url/shorten")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody2))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.shortUrl").exists());
+
+		// Then: DB에 2개의 레코드가 저장되어야 함
+		assertEquals(2, urlMappingRepository.count());
+
+		var allMappings = urlMappingRepository.findAll();
+		String shortUrl1 = allMappings.get(0).getShortUrl();
+		String shortUrl2 = allMappings.get(1).getShortUrl();
+		String shortCode1 = shortUrl1.substring(shortUrl1.lastIndexOf("/") + 1);
+		String shortCode2 = shortUrl2.substring(shortUrl2.lastIndexOf("/") + 1);
+
+		// 두 shortCode는 모두 keyword로 시작해야 함
+		assertTrue(shortCode1.startsWith(keyword), "첫 번째 shortCode는 keyword로 시작해야 합니다: " + shortCode1);
+		assertTrue(shortCode2.startsWith(keyword), "두 번째 shortCode는 keyword로 시작해야 합니다: " + shortCode2);
+
+		// 두 shortCode는 서로 달라야 함
+		assertNotEquals(shortCode1, shortCode2, "중복 요청 시 서로 다른 shortCode가 생성되어야 합니다.");
+
+		// 두 shortUrl은 서로 달라야 함
+		assertNotEquals(shortUrl1, shortUrl2, "중복 요청 시 서로 다른 shortUrl이 생성되어야 합니다.");
+
+		System.out.println("=== 중복 keyword 요청 검증 ===");
+		System.out.println("keyword: " + keyword);
+		System.out.println("첫 번째 shortCode: " + shortCode1);
+		System.out.println("두 번째 shortCode: " + shortCode2);
+		System.out.println("suffix1: " + shortCode1.substring(keyword.length()));
+		System.out.println("suffix2: " + shortCode2.substring(keyword.length()));
+	}
+
+	@Test
+	@DisplayName("keyword 단축 - 특수문자 포함 keyword, 400 에러 및 INVALID_KEYWORD_FORMAT 반환")
+	void shortenUrl_keyword_특수문자포함_400에러() throws Exception {
+		// Given: 특수문자가 포함된 유효하지 않은 keyword
+		String originalUrl = "https://www.example.com/invalid-keyword";
+		String invalidKeyword = "he!lo"; // 특수문자 포함
+		String requestBody = "{\"originalUrl\":\"" + originalUrl + "\", \"keyword\":\"" + invalidKeyword + "\"}";
+
+		// When & Then
+		mockMvc.perform(post("/api/v1/url/shorten")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.code").value("INVALID_KEYWORD_FORMAT"))
+			.andExpect(jsonPath("$.message").exists());
+
+		// DB에 저장되지 않아야 함
+		assertEquals(0, urlMappingRepository.count());
+
+		System.out.println("=== 특수문자 keyword 에러 검증 ===");
+		System.out.println("유효하지 않은 keyword: " + invalidKeyword);
+		System.out.println("기대 HTTP 상태: 400 Bad Request");
+		System.out.println("기대 에러 코드: INVALID_KEYWORD_FORMAT");
+	}
+
+	@Test
+	@DisplayName("keyword 단축 - 8자리 초과 keyword, 400 에러 및 INVALID_KEYWORD_FORMAT 반환")
+	void shortenUrl_keyword_8자리초과_400에러() throws Exception {
+		// Given: 8자리 이상 keyword (최대 7자리)
+		String originalUrl = "https://www.example.com/too-long-keyword";
+		String tooLongKeyword = "toolongkw"; // 9자리
+		String requestBody = "{\"originalUrl\":\"" + originalUrl + "\", \"keyword\":\"" + tooLongKeyword + "\"}";
+
+		// When & Then
+		mockMvc.perform(post("/api/v1/url/shorten")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.code").value("INVALID_KEYWORD_FORMAT"))
+			.andExpect(jsonPath("$.message").exists());
+
+		// DB에 저장되지 않아야 함
+		assertEquals(0, urlMappingRepository.count());
+
+		System.out.println("=== 8자리 초과 keyword 에러 검증 ===");
+		System.out.println("유효하지 않은 keyword: " + tooLongKeyword + " (" + tooLongKeyword.length() + "자)");
+		System.out.println("기대 HTTP 상태: 400 Bad Request");
+		System.out.println("기대 에러 코드: INVALID_KEYWORD_FORMAT");
+	}
+
+	@Test
+	@DisplayName("keyword 단축 - 공백 포함 keyword, 400 에러 및 INVALID_KEYWORD_FORMAT 반환")
+	void shortenUrl_keyword_공백포함_400에러() throws Exception {
+		// Given: 공백이 포함된 keyword
+		String originalUrl = "https://www.example.com/space-keyword";
+		String spaceKeyword = "he lo"; // 공백 포함
+		String requestBody = "{\"originalUrl\":\"" + originalUrl + "\", \"keyword\":\"" + spaceKeyword + "\"}";
+
+		// When & Then
+		mockMvc.perform(post("/api/v1/url/shorten")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.code").value("INVALID_KEYWORD_FORMAT"))
+			.andExpect(jsonPath("$.message").exists());
+
+		// DB에 저장되지 않아야 함
+		assertEquals(0, urlMappingRepository.count());
+
+		System.out.println("=== 공백 포함 keyword 에러 검증 ===");
+		System.out.println("유효하지 않은 keyword: \"" + spaceKeyword + "\"");
+		System.out.println("기대 HTTP 상태: 400 Bad Request");
+		System.out.println("기대 에러 코드: INVALID_KEYWORD_FORMAT");
+	}
+
+	@Test
+	@DisplayName("keyword 단축 - 인증된 사용자 + keyword, UrlMapping에 Member가 연결되어야 함")
+	void shortenUrl_keyword_인증된사용자_Member연결() throws Exception {
+		// Given: Member 미리 생성
+		Member testMember = new Member(Provider.GOOGLE, "google-keyword-test", "keyword-member@example.com");
+		Member savedMember = memberRepository.save(testMember);
+
+		String originalUrl = "https://www.example.com/auth-keyword";
+		String keyword = "mylink";
+		String requestBody = "{\"originalUrl\":\"" + originalUrl + "\", \"keyword\":\"" + keyword + "\"}";
+
+		System.out.println("=== 인증된 사용자 keyword 단축 테스트 ===");
+		System.out.println("Member ID: " + savedMember.getId());
+		System.out.println("keyword: " + keyword);
+
+		// When: 인증된 사용자로 keyword 단축 요청
+		mockMvc.perform(post("/api/v1/url/shorten")
+				.with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString()))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.shortUrl").exists());
+
+		// Then: UrlMapping에 Member가 연결되었는지 검증
+		assertEquals(1, urlMappingRepository.count());
+
+		UrlMapping savedUrlMapping = urlMappingRepository.findAll().get(0);
+		String shortUrl = savedUrlMapping.getShortUrl();
+		String shortCode = shortUrl.substring(shortUrl.lastIndexOf("/") + 1);
+
+		// keyword가 prefix인지 검증
+		assertTrue(shortCode.startsWith(keyword), "shortCode는 keyword로 시작해야 합니다: " + shortCode);
+
+		// Member 연결 검증
+		assertNotNull(savedUrlMapping.getMember(), "인증된 사용자의 UrlMapping은 Member가 null이면 안 됩니다.");
+		assertEquals(savedMember.getId(), savedUrlMapping.getMember().getId());
+
+		Member linkedMember = memberRepository.findById(savedUrlMapping.getMember().getId()).orElseThrow();
+		assertEquals("keyword-member@example.com", linkedMember.getEmail());
+		assertEquals(Provider.GOOGLE, linkedMember.getProvider());
+
+		System.out.println("Member 연결 성공");
+		System.out.println("shortCode: " + shortCode);
+		System.out.println("연결된 Member ID: " + savedUrlMapping.getMember().getId());
+		System.out.println("Member Email: " + linkedMember.getEmail());
+	}
+
+	@Test
+	@DisplayName("keyword 단축 - 익명 사용자 + keyword, UrlMapping의 Member가 null이어야 함")
+	void shortenUrl_keyword_익명사용자_Member_null() throws Exception {
+		// Given
+		String originalUrl = "https://www.example.com/anon-keyword";
+		String keyword = "anon";
+		String requestBody = "{\"originalUrl\":\"" + originalUrl + "\", \"keyword\":\"" + keyword + "\"}";
+
+		System.out.println("=== 익명 사용자 keyword 단축 테스트 ===");
+		System.out.println("keyword: " + keyword);
+
+		// When: 인증 없이 keyword 단축 요청
+		mockMvc.perform(post("/api/v1/url/shorten")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestBody))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.shortUrl").exists());
+
+		// Then: UrlMapping의 Member가 null이어야 함
+		assertEquals(1, urlMappingRepository.count());
+
+		UrlMapping savedUrlMapping = urlMappingRepository.findAll().get(0);
+		String shortUrl = savedUrlMapping.getShortUrl();
+		String shortCode = shortUrl.substring(shortUrl.lastIndexOf("/") + 1);
+
+		assertTrue(shortCode.startsWith(keyword), "shortCode는 keyword로 시작해야 합니다: " + shortCode);
+		assertNull(savedUrlMapping.getMember(), "익명 사용자의 UrlMapping은 Member가 null이어야 합니다.");
+
+		System.out.println("익명 사용자 Member null 확인");
+		System.out.println("shortCode: " + shortCode);
+		System.out.println("Member: null");
+	}
+
 }
