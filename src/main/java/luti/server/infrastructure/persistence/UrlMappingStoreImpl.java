@@ -40,4 +40,9 @@ public class UrlMappingStoreImpl implements UrlMappingStore {
 	public void incrementClickCount(Long scrambledId) {
 		repository.incrementClickCount(scrambledId);
 	}
+
+	@Override
+	public void saveAndFlush(UrlMapping urlMapping) {
+		repository.saveAndFlush(urlMapping);
+	}
 }

@@ -32,6 +32,7 @@ public class UrlService {
 	private final MemberReader memberReader;
 	private final Base62Encoder base62Encoder;
 	private final IdScrambler idScrambler;
+	private final KeywordUrlInserter keywordUrlInserter;
 
 	@Value("${DOMAIN}")
 	private String DOMAIN;
@@ -43,12 +44,13 @@ public class UrlService {
 
 	public UrlService(UrlMappingReader urlMappingReader,
 					  UrlMappingStore urlMappingStore, MemberReader memberReader, Base62Encoder base62Encoder,
-					  IdScrambler idScrambler) {
+					  IdScrambler idScrambler, KeywordUrlInserter keywordUrlInserter) {
 		this.urlMappingReader = urlMappingReader;
 		this.urlMappingStore = urlMappingStore;
 		this.memberReader = memberReader;
 		this.base62Encoder = base62Encoder;
 		this.idScrambler = idScrambler;
+		this.keywordUrlInserter = keywordUrlInserter;
 	}
 
 	@Transactional
@@ -106,7 +108,7 @@ public class UrlService {
 											  .build();
 
 			try {
-				urlMappingStore.save(urlMapping);
+				urlMappingStore.saveAndFlush(urlMapping);
 				return urlMapping.getShortUrl();
 			} catch (Exception e) {
 				throw new BusinessException(CANNOT_USE_KEYWORD);
@@ -114,44 +116,23 @@ public class UrlService {
 		}
 
 		// 키워드가 7자리보다 짧으면 suffix를 붙여가면서 시도
+
+		String shortUrl = keywordUrlInserter.tryInsertKeywordMapping(originalUrl, keyword, memberId);
+		if (shortUrl != null) {
+			return shortUrl;
+		}
+
 		for (long i = 0; ; i++) {
 			String suffix = base62Encoder.encode(i);
 			if (suffix.length() > suffixMaxLen) break;
 
 			String candidateShortCode = keyword + suffix;
-			String shortUrl = tryInsertKeywordMapping(originalUrl, candidateShortCode, memberId);
+			shortUrl = keywordUrlInserter.tryInsertKeywordMapping(originalUrl, candidateShortCode, memberId);
 			if (shortUrl != null) {
 				return shortUrl;
 			}
 		}
 		throw new BusinessException(CANNOT_USE_KEYWORD);
-	}
-
-	private String tryInsertKeywordMapping(String originalUrl, String candidateShortCode, Long memberId) {
-		Member member = Optional.ofNullable(memberId)
-								.flatMap(memberReader::findById)
-								.orElse(null);
-
-		String shortUrl = DOMAIN + "/" + candidateShortCode;
-
-		Long scrambledId = base62Encoder.decode(candidateShortCode);
-		Long kgsId = idScrambler.descramble(scrambledId);
-
-		UrlMapping urlMapping = UrlMapping.builder()
-										  .scrambledId(scrambledId)
-										  .kgsId(kgsId)
-										  .originalUrl(originalUrl)
-										  .shortUrl(shortUrl)
-										  .appId(APP_ID)
-										  .member(member)
-										  .build();
-
-		try {
-			urlMappingStore.save(urlMapping);
-			return urlMapping.getShortUrl();
-		} catch (Exception e) {
-			return null;
-		}
 	}
 
 	private void validateKeyword(String keyword) {

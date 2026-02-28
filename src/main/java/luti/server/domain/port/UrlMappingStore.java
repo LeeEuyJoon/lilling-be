@@ -13,4 +13,6 @@ public interface UrlMappingStore {
 	void claimToMember(Long urlMappingId, Long memberId);
 
 	void incrementClickCount(Long scrambledId);
+
+	void saveAndFlush(UrlMapping urlMapping);
 }
