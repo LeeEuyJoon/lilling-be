@@ -23,7 +23,7 @@ public class ReversibilityTest {
 
 		// 알고리즘 실행
 		Long scrambled = scrambler.scramble(originalId);
-		Long unscrambled = scrambler.unscramble(scrambled);
+		Long unscrambled = scrambler.descramble(scrambled);
 
 		// 가역성 검증
 		assertThat(unscrambled)

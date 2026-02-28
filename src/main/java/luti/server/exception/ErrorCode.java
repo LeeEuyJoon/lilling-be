@@ -32,7 +32,8 @@ public enum ErrorCode {
 	UNSCRAMBLE_INPUT_NULL("3204", HttpStatus.BAD_REQUEST, "언스크램블링 입력값은 null일 수 없습니다"),
 	UNSCRAMBLE_INPUT_NEGATIVE("3205", HttpStatus.BAD_REQUEST, "언스크램블링 입력값은 음수일 수 없습니다"),
 	UNSCRAMBLE_INPUT_OVERFLOW("3206", HttpStatus.BAD_REQUEST, "언스크램블링 입력값이 허용 범위를 초과했습니다"),
-
+	INVALID_KEYWORD_FORMAT("3207", HttpStatus.BAD_REQUEST, "키워드 형식이 유효하지 않습니다"),
+	CANNOT_USE_KEYWORD("3208", HttpStatus.BAD_REQUEST, "해당 키워드로 더 이상 단축 URL을 생성할 수 없습니다"),
 
 	KGS_CONNECTION_FAILED("4001", HttpStatus.SERVICE_UNAVAILABLE, "KGS 서버 연결에 실패했습니다"),
 	KGS_NULL_RESPONSE("4002", HttpStatus.INTERNAL_SERVER_ERROR, "KGS 서버로부터 null 응답을 받았습니다"),

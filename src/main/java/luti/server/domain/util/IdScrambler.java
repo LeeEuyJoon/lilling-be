@@ -130,8 +130,9 @@ public class IdScrambler {
 	 * 파이스텔 네트워크 기반 ID 복호화 메서드
 	 * 비즈니스 로직에서는 사용되지 않음
 	 * 파이스텔 네트워크 구조의 가역성을 검증하기 위한 용도
+	 * -> 2026.02.28: keyword 기반 shortCode 생성 기능 추가하면서, 비즈니스 로직에서도 사용됨
 	 */
-	public Long unscramble(Long scrambledId) {
+	public Long descramble(Long scrambledId) {
 		// 입력값 검증
 		if (scrambledId == null) {
 			throw new BusinessException(UNSCRAMBLE_INPUT_NULL);
