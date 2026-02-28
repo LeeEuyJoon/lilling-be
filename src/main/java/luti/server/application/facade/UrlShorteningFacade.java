@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import luti.server.domain.model.Member;
 import luti.server.exception.BusinessException;
 import luti.server.exception.ErrorCode;
 import luti.server.infrastructure.client.kgs.KeyBlockManager;
@@ -52,6 +53,7 @@ public class UrlShorteningFacade {
 
 			Long nextId = null;
 			String encodedValue = null;
+			Member member = urlService.resolveMember(command.getMemberId());
 
 			for (int attempt = 0; attempt < MAX_AUTO_RETRIES; attempt++) {
 				nextId = keyBlockManager.getNextId();
@@ -59,7 +61,7 @@ public class UrlShorteningFacade {
 				encodedValue = base62Encoder.encode(scrambledId);
 
 				Optional<String> result = urlService.generateShortenedUrl(command.getOriginalUrl(), nextId, scrambledId,
-																		  encodedValue, command.getMemberId());
+																		  encodedValue, member);
 
 				if (result.isPresent()) {
 					shortenedUrl = result.get();

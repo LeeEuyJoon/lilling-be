@@ -3,7 +3,6 @@ package luti.server.domain.util;
 import static luti.server.exception.ErrorCode.*;
 
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import luti.server.exception.BusinessException;
 

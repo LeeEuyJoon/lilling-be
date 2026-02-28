@@ -17,7 +17,6 @@ import luti.server.domain.model.UrlMapping;
 import luti.server.domain.port.AtomicUrlMappingInserter;
 import luti.server.domain.port.MemberReader;
 import luti.server.domain.port.UrlMappingReader;
-import luti.server.domain.port.UrlMappingStore;
 import luti.server.domain.util.Base62Encoder;
 import luti.server.domain.util.IdScrambler;
 import luti.server.exception.BusinessException;
@@ -29,7 +28,6 @@ public class UrlService {
 	private static final Logger log = LoggerFactory.getLogger(UrlService.class);
 
 	private final UrlMappingReader urlMappingReader;
-	private final UrlMappingStore urlMappingStore;
 	private final MemberReader memberReader;
 	private final Base62Encoder base62Encoder;
 	private final IdScrambler idScrambler;
@@ -44,24 +42,18 @@ public class UrlService {
 	private static final Pattern BASE62_PATTERN = Pattern.compile("^[a-zA-Z0-9]{1,7}$");
 
 	public UrlService(UrlMappingReader urlMappingReader,
-					  UrlMappingStore urlMappingStore, MemberReader memberReader, Base62Encoder base62Encoder,
+					  MemberReader memberReader, Base62Encoder base62Encoder,
 					  IdScrambler idScrambler, AtomicUrlMappingInserter atomicInserter) {
 		this.urlMappingReader = urlMappingReader;
-		this.urlMappingStore = urlMappingStore;
 		this.memberReader = memberReader;
 		this.base62Encoder = base62Encoder;
 		this.idScrambler = idScrambler;
 		this.atomicInserter = atomicInserter;
 	}
 
-	@Transactional
-	public Optional<String> generateShortenedUrl(String originalUrl, Long nextId, Long scrambledId, String encodedValue,
-									   Long memberId) {
+	public Optional<String> generateShortenedUrl(String originalUrl, Long nextId, Long scrambledId,
+												  String encodedValue, Member member) {
 		log.debug("URL 매핑 생성 시작: kgsId={}, scrambledId={}, shortCode={}", nextId, scrambledId, encodedValue);
-
-		Member member = Optional.ofNullable(memberId)
-								.flatMap(memberReader::findById)
-								.orElse(null);
 
 		UrlMapping urlMapping = UrlMapping.builder()
 										  .scrambledId(scrambledId)
@@ -72,26 +64,24 @@ public class UrlService {
 										  .member(member)
 										  .build();
 
-
 		if (atomicInserter.tryInsert(urlMapping)) {
 			log.debug("URL 매핑 저장 성공: scrambledId={}, appId={}", scrambledId, APP_ID);
 			return Optional.of(urlMapping.getShortUrl());
 		}
-
 		return Optional.empty();
 	}
 
 	@Transactional
 	public String generateShortenedUrlWithKeyword(String originalUrl, String keyword, Long memberId) {
-
 		log.debug("URL 매핑 생성 (키워드) 시작: keyword={}", keyword);
 
 		validateKeyword(keyword);
 
+		Member member = resolveMember(memberId);
 		int suffixMaxLen = 7 - keyword.length();
 
 		// keyword 자체 먼저 시도
-		UrlMapping urlMapping = buildKeywordUrlMapping(originalUrl, keyword, memberId);
+		UrlMapping urlMapping = buildKeywordUrlMapping(originalUrl, keyword, member);
 		if (atomicInserter.tryInsert(urlMapping)) {
 			return urlMapping.getShortUrl();
 		}
@@ -101,7 +91,7 @@ public class UrlService {
 			String suffix = base62Encoder.encode(i);
 			if (suffix.length() > suffixMaxLen) break;
 
-			urlMapping = buildKeywordUrlMapping(originalUrl, keyword + suffix, memberId);
+			urlMapping = buildKeywordUrlMapping(originalUrl, keyword + suffix, member);
 			if (atomicInserter.tryInsert(urlMapping)) {
 				return urlMapping.getShortUrl();
 			}
@@ -109,12 +99,17 @@ public class UrlService {
 		throw new BusinessException(CANNOT_USE_KEYWORD);
 	}
 
+	public Member resolveMember(Long memberId) {
+		return Optional.ofNullable(memberId)
+					   .flatMap(memberReader::findById)
+					   .orElse(null);
+	}
+
 	private void validateKeyword(String keyword) {
 		if (!BASE62_PATTERN.matcher(keyword).matches()) {
 			throw new BusinessException(INVALID_KEYWORD_FORMAT);
 		}
 	}
-
 
 	@Cacheable(value = "urlMapping", key = "#p0")
 	public String getOriginalUrl(Long scrambledId) {
@@ -164,11 +159,7 @@ public class UrlService {
 		return Optional.of(shortCode);
 	}
 
-	private UrlMapping buildKeywordUrlMapping(String originalUrl, String shortCode, Long memberId) {
-		Member member = Optional.ofNullable(memberId)
-								.flatMap(memberReader::findById)
-								.orElse(null);
-
+	private UrlMapping buildKeywordUrlMapping(String originalUrl, String shortCode, Member member) {
 		Long scrambledId = base62Encoder.decode(shortCode);
 		Long kgsId = idScrambler.descramble(scrambledId);
 
