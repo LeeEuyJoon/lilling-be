@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import luti.server.domain.model.Member;
 import luti.server.domain.model.UrlMapping;
+import luti.server.domain.port.AtomicUrlMappingInserter;
 import luti.server.domain.port.MemberReader;
 import luti.server.domain.port.UrlMappingReader;
 import luti.server.domain.port.UrlMappingStore;
@@ -32,7 +33,7 @@ public class UrlService {
 	private final MemberReader memberReader;
 	private final Base62Encoder base62Encoder;
 	private final IdScrambler idScrambler;
-	private final KeywordUrlInserter keywordUrlInserter;
+	private final AtomicUrlMappingInserter atomicInserter;
 
 	@Value("${DOMAIN}")
 	private String DOMAIN;
@@ -44,13 +45,13 @@ public class UrlService {
 
 	public UrlService(UrlMappingReader urlMappingReader,
 					  UrlMappingStore urlMappingStore, MemberReader memberReader, Base62Encoder base62Encoder,
-					  IdScrambler idScrambler, KeywordUrlInserter keywordUrlInserter) {
+					  IdScrambler idScrambler, AtomicUrlMappingInserter atomicInserter) {
 		this.urlMappingReader = urlMappingReader;
 		this.urlMappingStore = urlMappingStore;
 		this.memberReader = memberReader;
 		this.base62Encoder = base62Encoder;
 		this.idScrambler = idScrambler;
-		this.keywordUrlInserter = keywordUrlInserter;
+		this.atomicInserter = atomicInserter;
 	}
 
 	@Transactional
@@ -82,54 +83,24 @@ public class UrlService {
 
 		log.debug("URL 매핑 생성 (키워드) 시작: keyword={}", keyword);
 
-		// 키워드를 사용할 수 있는지 확인하려면 키워드 자체를 shortCode로 쓰고 DB에 쓰기작업을 시도 (lill.ing/keyword)
-		// 만약 unique 제약조건에 걸리면 base62 기준으로 1씩 증가시키면서 재시도 (lill.ing/keyword1, lill.ing/keyword2, ...)
-
 		validateKeyword(keyword);
 
 		int suffixMaxLen = 7 - keyword.length();
-		if (suffixMaxLen == 0) {
-			// 키워드가 7자리면 그 키워드를 shortCode로 바로 사용
 
-			Member member = Optional.ofNullable(memberId)
-									.flatMap(memberReader::findById)
-									.orElse(null);
-
-			Long scrambledId = base62Encoder.decode(keyword);
-			Long kgsId = idScrambler.descramble(scrambledId);
-
-			UrlMapping urlMapping = UrlMapping.builder()
-											  .scrambledId(scrambledId)
-											  .kgsId(kgsId)
-											  .originalUrl(originalUrl)
-											  .shortUrl(DOMAIN + "/" + keyword)
-											  .appId(APP_ID)
-											  .member(member)
-											  .build();
-
-			try {
-				urlMappingStore.saveAndFlush(urlMapping);
-				return urlMapping.getShortUrl();
-			} catch (Exception e) {
-				throw new BusinessException(CANNOT_USE_KEYWORD);
-			}
+		// keyword 자체 먼저 시도
+		UrlMapping urlMapping = buildKeywordUrlMapping(originalUrl, keyword, memberId);
+		if (atomicInserter.tryInsert(urlMapping)) {
+			return urlMapping.getShortUrl();
 		}
 
-		// 키워드가 7자리보다 짧으면 suffix를 붙여가면서 시도
-
-		String shortUrl = keywordUrlInserter.tryInsertKeywordMapping(originalUrl, keyword, memberId);
-		if (shortUrl != null) {
-			return shortUrl;
-		}
-
+		// keyword + Base62 인코딩된 숫자 조합 시도 (keyword 자체가 이미 사용 중인 경우)
 		for (long i = 0; ; i++) {
 			String suffix = base62Encoder.encode(i);
 			if (suffix.length() > suffixMaxLen) break;
 
-			String candidateShortCode = keyword + suffix;
-			shortUrl = keywordUrlInserter.tryInsertKeywordMapping(originalUrl, candidateShortCode, memberId);
-			if (shortUrl != null) {
-				return shortUrl;
+			urlMapping = buildKeywordUrlMapping(originalUrl, keyword + suffix, memberId);
+			if (atomicInserter.tryInsert(urlMapping)) {
+				return urlMapping.getShortUrl();
 			}
 		}
 		throw new BusinessException(CANNOT_USE_KEYWORD);
@@ -188,6 +159,24 @@ public class UrlService {
 
 		log.debug("URL 형식 검증 성공: url={}, shortCode={}", url, shortCode);
 		return Optional.of(shortCode);
+	}
+
+	private UrlMapping buildKeywordUrlMapping(String originalUrl, String shortCode, Long memberId) {
+		Member member = Optional.ofNullable(memberId)
+								.flatMap(memberReader::findById)
+								.orElse(null);
+
+		Long scrambledId = base62Encoder.decode(shortCode);
+		Long kgsId = idScrambler.descramble(scrambledId);
+
+		return UrlMapping.builder()
+						 .scrambledId(scrambledId)
+						 .kgsId(kgsId)
+						 .originalUrl(originalUrl)
+						 .shortUrl(DOMAIN + "/" + shortCode)
+						 .appId(APP_ID)
+						 .member(member)
+						 .build();
 	}
 
 }
