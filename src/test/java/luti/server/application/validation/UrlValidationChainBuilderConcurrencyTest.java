@@ -26,7 +26,7 @@ import luti.server.application.validation.UrlValidation.v1.UrlValidationChainBui
 import luti.server.application.validation.UrlValidation.v1.UrlValidationContext;
 import luti.server.application.validation.UrlValidation.v1.UrlValidationHandler;
 import luti.server.domain.enums.VerifyUrlStatus;
-import luti.server.domain.service.UrlService;
+import luti.server.domain.service.UrlQueryService;
 import luti.server.domain.service.dto.UrlMappingInfo;
 import luti.server.domain.util.Base62Encoder;
 
@@ -37,25 +37,25 @@ class UrlValidationChainBuilderConcurrencyTest {
 	private UrlExistenceValidationHandler existenceValidator;
 	private UrlOwnershipValidationHandler ownershipValidator;
 
-	private UrlService urlService;
+	private UrlQueryService urlQueryService;
 	private Base62Encoder base62Encoder;
 
 	@BeforeEach
 	void setUp() {
-		urlService = mock(UrlService.class);
+		urlQueryService = mock(UrlQueryService.class);
 		base62Encoder = mock(Base62Encoder.class);
 
-		formatValidator = new UrlFormatValidationHandler(urlService);
-		existenceValidator = new UrlExistenceValidationHandler(base62Encoder, urlService);
+		formatValidator = new UrlFormatValidationHandler(urlQueryService);
+		existenceValidator = new UrlExistenceValidationHandler(base62Encoder, urlQueryService);
 		ownershipValidator = new UrlOwnershipValidationHandler();
 
 		chainBuilder = new UrlValidationChainBuilder(formatValidator, existenceValidator, ownershipValidator);
 
-		when(urlService.verifyAndExtractShortCode(anyString()))
+		when(urlQueryService.verifyAndExtractShortCode(anyString()))
 			.thenReturn(Optional.of("abc123"));
 		when(base62Encoder.decode(anyString()))
 			.thenReturn(123L);
-		when(urlService.findByDecodedId(anyLong()))
+		when(urlQueryService.findByDecodedId(anyLong()))
 			.thenReturn(Optional.of(createMockUrlMappingInfo(false)));
 	}
 
@@ -87,7 +87,7 @@ class UrlValidationChainBuilderConcurrencyTest {
 		List<Throwable> exceptions = new ArrayList<>();
 
 		// Mock: 소유자가 있는 URL → Verify는 ALREADY_OWNED 반환해야 함
-		when(urlService.findByDecodedId(anyLong()))
+		when(urlQueryService.findByDecodedId(anyLong()))
 			.thenReturn(Optional.of(createMockUrlMappingInfo(true)));
 
 		// Verify 스레드들

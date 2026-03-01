@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import luti.server.application.result.UrlVerifyResult;
-import luti.server.domain.service.UrlService;
+import luti.server.domain.service.UrlQueryService;
 import luti.server.domain.service.dto.UrlMappingInfo;
 import luti.server.domain.util.Base62Encoder;
 
@@ -14,12 +14,12 @@ public class UrlExistenceValidationHandler implements UrlValidationHandler {
 	private static final Logger log = LoggerFactory.getLogger(UrlExistenceValidationHandler.class);
 
 	private final Base62Encoder base62Encoder;
-	private final UrlService urlService;
+	private final UrlQueryService urlQueryService;
 	private UrlValidationHandler next;
 
-	public UrlExistenceValidationHandler(Base62Encoder base62Encoder, UrlService urlService) {
+	public UrlExistenceValidationHandler(Base62Encoder base62Encoder, UrlQueryService urlQueryService) {
 		this.base62Encoder = base62Encoder;
-		this.urlService = urlService;
+		this.urlQueryService = urlQueryService;
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class UrlExistenceValidationHandler implements UrlValidationHandler {
 		Long decodedId = base62Encoder.decode(context.getShortCode());
 		context.setDecodedId(decodedId);
 
-		Optional<UrlMappingInfo> urlInfo = urlService.findByDecodedId(decodedId);
+		Optional<UrlMappingInfo> urlInfo = urlQueryService.findByDecodedId(decodedId);
 
 		if (urlInfo.isEmpty()) {
 			log.debug("URL 존재 여부 검증 실패: decodedId={}", decodedId);

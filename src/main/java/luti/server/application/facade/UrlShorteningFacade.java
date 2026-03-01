@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import luti.server.domain.model.Member;
 import luti.server.exception.BusinessException;
 import luti.server.exception.ErrorCode;
 import luti.server.infrastructure.client.kgs.KeyBlockManager;
@@ -14,7 +13,7 @@ import luti.server.application.command.ShortenUrlCommand;
 import luti.server.application.result.ShortenUrlResult;
 import luti.server.domain.util.Base62Encoder;
 import luti.server.domain.util.IdScrambler;
-import luti.server.domain.service.UrlService;
+import luti.server.domain.service.UrlShorteningService;
 
 @Component
 public class UrlShorteningFacade {
@@ -24,16 +23,16 @@ public class UrlShorteningFacade {
 	private final IdScrambler idScrambler;
 	private final Base62Encoder base62Encoder;
 	private final KeyBlockManager keyBlockManager;
-	private final UrlService urlService;
+	private final UrlShorteningService urlShorteningService;
 
 	private static final int MAX_AUTO_RETRIES = 20;
 
 	public UrlShorteningFacade(IdScrambler idScrambler, Base62Encoder base62Encoder, KeyBlockManager keyBlockManager,
-							   UrlService urlService) {
+							   UrlShorteningService urlShorteningService) {
 		this.idScrambler = idScrambler;
 		this.base62Encoder = base62Encoder;
 		this.keyBlockManager = keyBlockManager;
-		this.urlService = urlService;
+		this.urlShorteningService = urlShorteningService;
 	}
 
 	/**
@@ -45,7 +44,7 @@ public class UrlShorteningFacade {
 
 		log.info("URL 단축 요청: originalUrl={}", command.getOriginalUrl());
 
-		urlService.validateOriginalUrl(command.getOriginalUrl());
+		urlShorteningService.validateOriginalUrl(command.getOriginalUrl());
 
 		boolean hasKeyword = command.getKeyword() != null && !command.getKeyword().isBlank();
 
@@ -55,15 +54,15 @@ public class UrlShorteningFacade {
 
 			Long nextId = null;
 			String encodedValue = null;
-			Member member = urlService.resolveMember(command.getMemberId());
 
 			for (int attempt = 0; attempt < MAX_AUTO_RETRIES; attempt++) {
 				nextId = keyBlockManager.getNextId();
 				Long scrambledId = idScrambler.scramble(nextId);
 				encodedValue = base62Encoder.encode(scrambledId);
 
-				Optional<String> result = urlService.generateShortenedUrl(command.getOriginalUrl(), nextId, scrambledId,
-																		  encodedValue, member);
+				Optional<String> result = urlShorteningService.generateShortenedUrl(command.getOriginalUrl(), nextId,
+																					scrambledId, encodedValue,
+																					command.getMemberId());
 
 				if (result.isPresent()) {
 					shortenedUrl = result.get();
@@ -78,8 +77,9 @@ public class UrlShorteningFacade {
 
 			log.info("URL 단축 성공 (auto): shortCode={}, kgsId={}, shortenedUrl={}", encodedValue, nextId, shortenedUrl);
 		} else {
-			shortenedUrl = urlService.generateShortenedUrlWithKeyword(command.getOriginalUrl(), command.getKeyword(),
-																	  command.getMemberId());
+			shortenedUrl = urlShorteningService.generateShortenedUrlWithKeyword(command.getOriginalUrl(),
+																				command.getKeyword(),
+																				command.getMemberId());
 
 			log.info("URL 단축 성공 (keyword): shortCode={}, shortenedUrl={}", command.getKeyword(), shortenedUrl);
 		}

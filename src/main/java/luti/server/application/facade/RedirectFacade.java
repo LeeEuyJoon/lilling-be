@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import luti.server.application.result.RedirectResult;
 import luti.server.domain.util.Base62Encoder;
 import luti.server.domain.service.ClickCountService;
-import luti.server.domain.service.UrlService;
+import luti.server.domain.service.UrlQueryService;
 
 @Component
 public class RedirectFacade {
@@ -15,12 +15,12 @@ public class RedirectFacade {
 	private static final Logger log = LoggerFactory.getLogger(RedirectFacade.class);
 
 	private final Base62Encoder base62Encoder;
-	private final UrlService urlService;
+	private final UrlQueryService urlQueryService;
 	private final ClickCountService clickCountService;
 
-	public RedirectFacade(Base62Encoder base62Encoder, UrlService urlService, ClickCountService clickCountService) {
+	public RedirectFacade(Base62Encoder base62Encoder, UrlQueryService urlQueryService, ClickCountService clickCountService) {
 		this.base62Encoder = base62Encoder;
-		this.urlService = urlService;
+		this.urlQueryService = urlQueryService;
 		this.clickCountService = clickCountService;
 	}
 
@@ -30,7 +30,7 @@ public class RedirectFacade {
 		Long decodedId = base62Encoder.decode(shortCode);
 		clickCountService.recordClick(decodedId); // async
 
-		String originalUrl = urlService.getOriginalUrl(decodedId);
+		String originalUrl = urlQueryService.getOriginalUrl(decodedId);
 		RedirectResult result = RedirectResult.of(originalUrl);
 
 		return result;
