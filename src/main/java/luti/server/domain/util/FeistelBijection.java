@@ -16,6 +16,10 @@ public class FeistelBijection {
 		this.xorConst3 = xorConst3;
 	}
 
+	public long getM() {
+		return M;
+	}
+
 	/**
 	 * 파이스텔 네트워크 연산에 사용되는 F 함수
 	 * 무작위성을 부여하는 비선형 혼합기
@@ -96,6 +100,5 @@ public class FeistelBijection {
 			}
 		}
 	}
-
 
 }
