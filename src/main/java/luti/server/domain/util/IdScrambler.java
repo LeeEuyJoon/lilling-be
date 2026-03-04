@@ -2,6 +2,7 @@ package luti.server.domain.util;
 
 import static luti.server.exception.ErrorCode.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -22,59 +23,16 @@ import luti.server.exception.BusinessException;
 @Component
 public class IdScrambler {
 
-	@Value("${SCRAMBLING_CONST_XOR1}")
-	private long xorConst1;
+	private static final long SCRAMBLER_M = 3_521_614_606_208L; // 62^7
 
-	@Value("${SCRAMBLING_CONST_XOR2}")
-	private long xorConst2;
+	private final FeistelBijection bijection;
 
-	@Value("${SCRAMBLING_CONST_XOR3}")
-	private long xorConst3;
-
-	/**
-	 * 최대값 M = 62^7 -> 보장 가능한 7자리 이하의 고유한 ID 개수
-	 */
-	private final long M;
-
-	/**
-	 * M의 제곱근 -> 파이스텔 L, R을 나누는 기준 크기
-	 * (전체 공간 M ≈ m × m)
-	 */
-	private final long m;
-
-	/**
-	 * 기본 생성자 -> Spring Container 용
-	 */
-	public IdScrambler() {
-		this.M = 3_521_614_606_208L;
-		this.m = (long) Math.ceil(Math.sqrt(M));
-	}
-
-	/**
-	 * Property Based Testing 용
-	 */
-	public IdScrambler(long M, long xorConst1, long xorConst2, long xorConst3) {
-		this.M = M;
-		this.m = (long) Math.ceil(Math.sqrt(M));
-		this.xorConst1 = xorConst1;
-		this.xorConst2 = xorConst2;
-		this.xorConst3 = xorConst3;
-	}
-
-	/**
-	 * 파이스텔 네트워크 연산에 사용되는 F 함수
-	 * 무작위성을 부여하는 비선형 혼합기
-	 * XORShift 연산 사용
-	 */
-	private long F(long x) {
-		long val = x;
-		val ^= (val << xorConst1);
-		val ^= (val >>> xorConst2);
-		val ^= (val << xorConst3);
-
-		// 결과값을 [0, m-1] 범위로 축소
-		// 파이스텔 네트워크에서 노드의 크기는 최대 m이어야 함
-		return Math.floorMod(val, m);
+	public IdScrambler(
+		@Value("${SCRAMBLING_CONST_XOR1}") long xorConst1,
+		@Value("${SCRAMBLING_CONST_XOR2}") long xorConst2,
+		@Value("${SCRAMBLING_CONST_XOR3}") long xorConst3
+	) {
+		this.bijection = new FeistelBijection(SCRAMBLER_M, xorConst1, xorConst2, xorConst3);
 	}
 
 	/**
@@ -88,41 +46,11 @@ public class IdScrambler {
 		if (id < 0) {
 			throw new BusinessException(SCRAMBLE_INPUT_NEGATIVE);
 		}
-		if (id >= M) {
+		if (id >= SCRAMBLER_M) {
 			throw new BusinessException(SCRAMBLE_INPUT_OVERFLOW);
 		}
 
-		long currentId = id;
-
-		/**
-		 * 각 라운드 구조
-		 * L1 = R0
-		 * R1 = (L0 + F(R0)) mod m
-		 */
-		while (true) {
-
-			long L = currentId / m;
-			long R = currentId % m;
-
-			long F1 = F(L);
-			R = Math.floorMod(R + F1, m);
-
-			long F2 = F(R);
-			L = Math.floorMod(L + F2, m);
-
-			long F3 = F(L);
-			R = Math.floorMod(R + F3, m);
-
-			long F4 = F(R);
-			L = Math.floorMod(L + F4, m);
-
-			currentId = L * m + R;
-
-			//
-			if (currentId < M) {
-				return currentId;
-			}
-		}
+		return bijection.permute(id);
 	}
 
 	/**
@@ -139,40 +67,11 @@ public class IdScrambler {
 		if (scrambledId < 0) {
 			throw new BusinessException(UNSCRAMBLE_INPUT_NEGATIVE);
 		}
-		if (scrambledId >= M) {
+		if (scrambledId >= SCRAMBLER_M) {
 			throw new BusinessException(UNSCRAMBLE_INPUT_OVERFLOW);
 		}
 
-		long currentId = scrambledId;
-
-		/**
-		 * 각 라운드 구조 (역순)
-		 * R0 = L1
-		 * L0 = (R1 - F(L1)) mod m
-		 */
-		while (true) {
-
-			long L = currentId / m;
-			long R = currentId % m;
-
-			long F4 = F(R);
-			L = Math.floorMod(L - F4, m);
-
-			long F3 = F(L);
-			R = Math.floorMod(R - F3, m);
-
-			long F2 = F(R);
-			L = Math.floorMod(L - F2, m);
-
-			long F1 = F(L);
-			R = Math.floorMod(R - F1, m);
-
-			currentId = L * m + R;
-
-			if (currentId < M) {
-				return currentId;
-			}
-		}
+		return bijection.inversePermute(scrambledId);
 
 	}
 }
