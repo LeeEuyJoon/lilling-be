@@ -41,51 +41,56 @@ public class UrlShorteningFacade {
 	 * - keyword가 있는 경우: keyword 로직 (검증 + 저장)
 	 */
 	public ShortenUrlResult shortenUrl(ShortenUrlCommand command) {
-
 		log.info("URL 단축 요청: originalUrl={}", command.getOriginalUrl());
-
 		urlShorteningService.validateOriginalUrl(command.getOriginalUrl());
 
-		boolean hasKeyword = command.getKeyword() != null && !command.getKeyword().isBlank();
+		String shortenedUrl;
 
-		String shortenedUrl = null;
-
-		if (!hasKeyword) {
-
-			Long nextId = null;
-			String encodedValue = null;
-
-			for (int attempt = 0; attempt < MAX_AUTO_RETRIES; attempt++) {
-				nextId = keyBlockManager.getNextId();
-				Long scrambledId = idScrambler.scramble(nextId);
-				encodedValue = base62Encoder.encode(scrambledId);
-
-				Optional<String> result = urlShorteningService.generateShortenedUrl(command.getOriginalUrl(), nextId,
-																					scrambledId, encodedValue,
-																					command.getMemberId());
-
-				if (result.isPresent()) {
-					shortenedUrl = result.get();
-					break;
-				}
-			}
-
-			if (shortenedUrl == null) {
-				log.error("URL 단축 실패: auto 로직에서 최대 재시도 횟수 초과");
-				throw new BusinessException(ErrorCode.AUTO_SHORTEN_FAILED);
-			}
-
-			log.info("URL 단축 성공 (auto): shortCode={}, kgsId={}, shortenedUrl={}", encodedValue, nextId, shortenedUrl);
-		} else {
-			shortenedUrl = urlShorteningService.generateShortenedUrlWithKeyword(command.getOriginalUrl(),
-																				command.getKeyword(),
-																				command.getMemberId());
-
-			log.info("URL 단축 성공 (keyword): shortCode={}, shortenedUrl={}", command.getKeyword(), shortenedUrl);
+		if (hasKeyword(command)) {
+			shortenedUrl = shortenWithKeyword(command);
+			return ShortenUrlResult.of(shortenedUrl);
 		}
 
-		return ShortenUrlResult.of(shortenedUrl);
+		if (!hasKeyword(command)) {
+			shortenedUrl = shortenAuto(command);
+			return ShortenUrlResult.of(shortenedUrl);
+		}
 
+		throw new IllegalStateException("unreachable");
+	}
+
+	private boolean hasKeyword(ShortenUrlCommand command) {
+		return command.getKeyword() != null && !command.getKeyword().isBlank();
+	}
+
+	private String shortenAuto(ShortenUrlCommand command) {
+		Long nextId = null;
+		String encodedValue = null;
+
+		for (int attempt = 0; attempt < MAX_AUTO_RETRIES; attempt++) {
+			nextId = keyBlockManager.getNextId();
+			Long scrambledId = idScrambler.scramble(nextId);
+			encodedValue = base62Encoder.encode(scrambledId);
+
+			Optional<String> result = urlShorteningService.generateShortenedUrl(
+				command.getOriginalUrl(), nextId, scrambledId, encodedValue, command.getMemberId());
+
+			if (result.isPresent()) {
+				log.info("URL 단축 성공 (auto): shortCode={}, kgsId={}, shortenedUrl={}", encodedValue, nextId, result.get());
+				return result.get();
+			}
+		}
+
+		log.error("URL 단축 실패: auto 로직에서 최대 재시도 횟수 초과");
+		throw new BusinessException(ErrorCode.AUTO_SHORTEN_FAILED);
+	}
+
+	private String shortenWithKeyword(ShortenUrlCommand command) {
+		String shortenedUrl = urlShorteningService.generateShortenedUrlWithKeyword(
+			command.getOriginalUrl(), command.getKeyword(), command.getMemberId());
+
+		log.info("URL 단축 성공 (keyword): shortCode={}, shortenedUrl={}", command.getKeyword(), shortenedUrl);
+		return shortenedUrl;
 	}
 
 }
