@@ -7,7 +7,9 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,8 @@ public class UrlShorteningService {
 	private final IdScrambler idScrambler;
 	private final AtomicUrlMappingInserter atomicInserter;
 	private final KeywordSuffixScrambler keywordSuffixScrambler;
+	@Qualifier("counterRedisTemplate")
+	private final RedisTemplate<String, Long> counterRedisTemplate;
 
 	@Value("${DOMAIN}")
 	private String DOMAIN;
@@ -37,16 +41,21 @@ public class UrlShorteningService {
 	@Value("${APP_ID}")
 	private String APP_ID;
 
+	private static final String KEYWORD_COUNTER_KEY_PREFIX = "kw:cnt:";
+	private static final int MAX_COUNTER_RETRY = 5;
+
 	private static final Pattern BASE62_PATTERN = Pattern.compile("^[a-zA-Z0-9]{1,7}$");
 
 	public UrlShorteningService(MemberReader memberReader, Base62Encoder base62Encoder,
 								IdScrambler idScrambler, AtomicUrlMappingInserter atomicInserter,
-								KeywordSuffixScrambler keywordSuffixScrambler) {
+								KeywordSuffixScrambler keywordSuffixScrambler,
+								RedisTemplate<String, Long> counterRedisTemplate) {
 		this.memberReader = memberReader;
 		this.base62Encoder = base62Encoder;
 		this.idScrambler = idScrambler;
 		this.atomicInserter = atomicInserter;
 		this.keywordSuffixScrambler = keywordSuffixScrambler;
+		this.counterRedisTemplate = counterRedisTemplate;
 	}
 
 	public Optional<String> generateShortenedUrl(String originalUrl, Long nextId, Long scrambledId,
@@ -90,13 +99,22 @@ public class UrlShorteningService {
 			throw new BusinessException(CANNOT_USE_KEYWORD);
 		}
 
-		// 파이스텔 스크램블링된 순서로 suffix 탐색
+		// redis counter로 고유한 N 발급 -> Feistel 스크램블링 -> suffix 생성
 		long suffixSpace = keywordSuffixScrambler.suffixSpace(keyword);
-		for (long i = 0; i < suffixSpace; i++) {
-			long scrambledI = keywordSuffixScrambler.scramble(i, keyword);
-			String suffix = base62Encoder.encode(scrambledI);
 
-			urlMapping = buildKeywordUrlMapping(originalUrl, keyword + suffix, member);
+		for (int attempt = 0; attempt < MAX_COUNTER_RETRY; attempt++) {
+			Long rawCounter = counterRedisTemplate.opsForValue()
+				.increment(KEYWORD_COUNTER_KEY_PREFIX + keyword);
+			long N = rawCounter - 1;
+
+			if (N >= suffixSpace) {
+				throw new BusinessException(CANNOT_USE_KEYWORD);
+			}
+
+			long scrambled = keywordSuffixScrambler.scramble(N, keyword);
+			String shortCode = keyword + base62Encoder.encode(scrambled);
+
+			urlMapping = buildKeywordUrlMapping(originalUrl, shortCode, member);
 			if (atomicInserter.tryInsert(urlMapping)) {
 				return urlMapping.getShortUrl();
 			}

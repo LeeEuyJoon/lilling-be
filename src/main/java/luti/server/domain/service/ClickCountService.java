@@ -2,6 +2,7 @@ package luti.server.domain.service;
 
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ public class ClickCountService {
 	private final RedisTemplate<String, Long> redisTemplate;
 	private final UrlMappingStore urlMappingStore;
 
-	public ClickCountService(RedisTemplate<String, Long> redisTemplate, UrlMappingStore urlMappingStore) {
+	public ClickCountService(@Qualifier("cacheRedisTemplate") RedisTemplate<String, Long> redisTemplate, UrlMappingStore urlMappingStore) {
 		this.redisTemplate = redisTemplate;
 		this.urlMappingStore = urlMappingStore;
 	}

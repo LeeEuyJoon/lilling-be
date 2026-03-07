@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +27,7 @@ public class ClickCountRedisReader implements ItemReader<ClickCountData> {
 	private static final String CLICK_COUNT_KEY_PREFIX = "click:count:";
 	private static final Integer BATCH_SIZE = 1000;
 
-	public ClickCountRedisReader(RedisTemplate<String, Long> redisTemplate) {
+	public ClickCountRedisReader(@Qualifier("cacheRedisTemplate") RedisTemplate<String, Long> redisTemplate) {
 		this.redisTemplate = redisTemplate;
 	}
 

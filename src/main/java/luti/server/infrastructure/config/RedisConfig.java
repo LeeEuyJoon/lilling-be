@@ -26,7 +26,7 @@ public class RedisConfig implements CachingConfigurer {
 
 	private static final Logger log = LoggerFactory.getLogger(RedisConfig.class);
 
-	@Bean
+	@Bean("cacheRedisTemplate")
 	public RedisTemplate<String, Long> redisTemplate(RedisConnectionFactory connectionFactory) {
 		RedisTemplate<String, Long> template = new RedisTemplate<>();
 		template.setConnectionFactory(connectionFactory);
