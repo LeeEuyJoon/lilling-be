@@ -7,7 +7,7 @@ import java.util.List;
 
 import net.jqwik.api.*;
 
-import luti.server.domain.util.IdScrambler;
+import luti.server.domain.util.FeistelBijection;
 
 public class PropertyBasedTest {
 
@@ -52,11 +52,11 @@ public class PropertyBasedTest {
 
 	// 공통 테스트 로직 메서드
 	void runScrambleTest(List<Long> ids) {
-		IdScrambler scrambler = new IdScrambler(M, 13, 7, 17);
+		FeistelBijection bijection = new FeistelBijection(M, 13, 7, 17);
 		HashSet<Long> seen = new HashSet<>();
 
 		for (Long id : ids) {
-			Long scrambled = scrambler.scramble(id);
+			Long scrambled = bijection.permute(id);
 
 			assertThat(scrambled)
 				.isGreaterThanOrEqualTo(0L)

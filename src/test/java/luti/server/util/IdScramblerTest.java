@@ -15,11 +15,10 @@ class IdScramblerTest {
 
 	@BeforeEach
 	void setUp() {
-		long M = 3_521_614_606_208L;
 		long xorConst1 = 13L;
 		long xorConst2 = 7L;
 		long xorConst3 = 17L;
-		scrambler = new IdScrambler(M, xorConst1, xorConst2, xorConst3);
+		scrambler = new IdScrambler(xorConst1, xorConst2, xorConst3);
 	}
 
 	@Test

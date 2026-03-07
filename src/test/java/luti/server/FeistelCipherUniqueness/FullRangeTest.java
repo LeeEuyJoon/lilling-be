@@ -7,7 +7,7 @@ import java.util.HashSet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import luti.server.domain.util.IdScrambler;
+import luti.server.domain.util.FeistelBijection;
 
 public class FullRangeTest {
 
@@ -17,14 +17,14 @@ public class FullRangeTest {
 
 		long smallM = 1_000_000L; // 100만
 
-		IdScrambler scrambler = new IdScrambler(smallM, 13, 7, 17);
+		FeistelBijection bijection = new FeistelBijection(smallM, 13, 7, 17);
 
 		HashSet<Long> set = new HashSet<>((int) smallM);
 
 		for (long id = 0; id < smallM; id++) {
 
 			// 알고리즘 적용
-			Long scrambled = scrambler.scramble(id);
+			long scrambled = bijection.permute(id);
 
 			// 출력 범위 검증
 			assertThat(scrambled)
