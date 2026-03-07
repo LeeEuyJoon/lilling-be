@@ -2,7 +2,6 @@ package luti.server.domain.util;
 
 import static luti.server.exception.ErrorCode.*;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

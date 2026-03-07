@@ -78,7 +78,6 @@ public class UrlShorteningService {
 		validateKeyword(keyword);
 
 		Member member = resolveMember(memberId);
-		int suffixMaxLen = 7 - keyword.length();
 
 		// keyword 자체 먼저 시도
 		UrlMapping urlMapping = buildKeywordUrlMapping(originalUrl, keyword, member);
@@ -87,14 +86,14 @@ public class UrlShorteningService {
 		}
 
 		// suffix 공간이 없는 경우 바로 실패 (keyword가 7글자인 경우)
-		if (suffixMaxLen == 0) {
+		if (keyword.length() == 7) {
 			throw new BusinessException(CANNOT_USE_KEYWORD);
 		}
 
 		// 파이스텔 스크램블링된 순서로 suffix 탐색
-		long suffixSpace = keywordSuffixScrambler.suffixSpace(suffixMaxLen);
+		long suffixSpace = keywordSuffixScrambler.suffixSpace(keyword);
 		for (long i = 0; i < suffixSpace; i++) {
-			long scrambledI = keywordSuffixScrambler.scramble(i, suffixMaxLen);
+			long scrambledI = keywordSuffixScrambler.scramble(i, keyword);
 			String suffix = base62Encoder.encode(scrambledI);
 
 			urlMapping = buildKeywordUrlMapping(originalUrl, keyword + suffix, member);
