@@ -14,7 +14,7 @@ public class KeywordSuffixScrambler {
 		@Value("${SCRAMBLING_CONST_XOR3}") long xorConst3
 	) {
 		bijections = new FeistelBijection[7];
-		Long M = 62L;
+		long M = 62L;
 		for (int k = 1; k <= 6; k++) {
 			bijections[k] = new FeistelBijection(M, xorConst1, xorConst2, xorConst3);
 			M *= 62L;
