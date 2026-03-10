@@ -88,14 +88,12 @@ public class UrlShorteningService {
 
 		Member member = resolveMember(memberId);
 
-		// keyword 자체 먼저 시도
-		UrlMapping urlMapping = buildKeywordUrlMapping(originalUrl, keyword, member);
-		if (atomicInserter.tryInsert(urlMapping)) {
-			return urlMapping.getShortUrl();
-		}
-
-		// suffix 공간이 없는 경우 바로 실패 (keyword가 7글자인 경우)
+		// 7글자 키워드: suffix 공간 없음 → 최초 요청자만 해당 shortCode 획득 (선점)
 		if (keyword.length() == 7) {
+			UrlMapping urlMapping = buildKeywordUrlMapping(originalUrl, keyword, member);
+			if (atomicInserter.tryInsert(urlMapping)) {
+				return urlMapping.getShortUrl();
+			}
 			throw new BusinessException(CANNOT_USE_KEYWORD);
 		}
 
@@ -105,7 +103,7 @@ public class UrlShorteningService {
 		for (int attempt = 0; attempt < MAX_COUNTER_RETRY; attempt++) {
 			Long rawCounter = counterRedisTemplate.opsForValue()
 				.increment(KEYWORD_COUNTER_KEY_PREFIX + keyword);
-			long N = rawCounter - 1;
+			long N = rawCounter;
 
 			if (N >= suffixSpace) {
 				throw new BusinessException(CANNOT_USE_KEYWORD);
@@ -114,10 +112,11 @@ public class UrlShorteningService {
 			long scrambled = keywordSuffixScrambler.scramble(N, keyword);
 			String shortCode = keyword + base62Encoder.encode(scrambled);
 
-			urlMapping = buildKeywordUrlMapping(originalUrl, shortCode, member);
+			UrlMapping urlMapping = buildKeywordUrlMapping(originalUrl, shortCode, member);
 			if (atomicInserter.tryInsert(urlMapping)) {
 				return urlMapping.getShortUrl();
 			}
+			log.warn("keyword suffix insert 실패 (N={}, attempt={}), 다음 N 시도", N, attempt);
 		}
 
 		throw new BusinessException(CANNOT_USE_KEYWORD);
