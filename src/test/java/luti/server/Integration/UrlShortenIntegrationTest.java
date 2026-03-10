@@ -56,6 +56,8 @@ class UrlShortenIntegrationTest {
 		// Redis 설정
 		registry.add("spring.data.redis.host", redis::getHost);
 		registry.add("spring.data.redis.port", redis::getFirstMappedPort);
+		registry.add("redis.counter.host", redis::getHost);
+		registry.add("redis.counter.port", redis::getFirstMappedPort);
 
 		// JWT 설정
 		registry.add("JWT_SECRET_KEY", () -> "test-secret-key-for-jwt-signing-at-least-32-characters-long");

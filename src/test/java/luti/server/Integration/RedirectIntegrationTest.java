@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -54,6 +55,8 @@ class RedirectIntegrationTest {
 		// Redis 설정
 		registry.add("spring.data.redis.host", redis::getHost);
 		registry.add("spring.data.redis.port", redis::getFirstMappedPort);
+		registry.add("redis.counter.host", redis::getHost);
+		registry.add("redis.counter.port", redis::getFirstMappedPort);
 
 		// JWT 설정
 		registry.add("JWT_SECRET_KEY", () -> "test-secret-key-for-jwt-signing-at-least-32-characters-long");
@@ -72,6 +75,7 @@ class RedirectIntegrationTest {
 	private UrlMappingRepository urlMappingRepository;
 
 	@Autowired
+	@Qualifier("cacheRedisTemplate")
 	private RedisTemplate<String, Long> redisTemplate;
 
 	@BeforeEach

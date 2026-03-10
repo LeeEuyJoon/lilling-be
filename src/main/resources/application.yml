@@ -46,6 +46,11 @@ spring:
     jdbc:
       initialize-schema: always
 
+redis:
+  counter:
+    host: ${REDIS_COUNTER_HOST}
+    port: ${REDIS_COUNTER_PORT}
+
 batch:
   schedule:
     click-count-sync:
