@@ -64,10 +64,13 @@ public enum ErrorCode {
 		this.message = message;
 	}
 
+	public String getNumericCode() {
+		return this.code;
+	}
+
 	public String getMessage() {
 		return "[" + this.code + "] " + this.message;
 	}
-
 
 	public HttpStatus getHttpStatus() {
 		return this.httpStatus;
