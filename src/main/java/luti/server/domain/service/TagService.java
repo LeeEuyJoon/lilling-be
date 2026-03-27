@@ -45,6 +45,12 @@ public class TagService {
 		this.urlMappingReader = urlMappingReader;
 	}
 
+	@Transactional(readOnly = true)
+	public List<TagInfo> getTagsByMember(Long memberId) {
+		return tagReader.findAllByMemberId(memberId).stream()
+						.map(TagInfo::from).toList();
+	}
+
 	@Transactional
 	public TagInfo createTag(Long memberId, String name) {
 
