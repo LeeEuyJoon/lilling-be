@@ -12,6 +12,7 @@ public enum ErrorCode {
 	 * 5xxx: 회원 관련 오류
 	 * 6xxx: my-urls 관련 오류
 	 * 7xxx: 인증 관련 오류
+	 * 8xxx: 태그 관련 오류
 	 */
 
 	DEFAULT_BUSINESS_ERROR("0000", HttpStatus.BAD_REQUEST, "서버 오류 발생"),
@@ -50,8 +51,12 @@ public enum ErrorCode {
 	ALREADY_OWNED_URL("6003", HttpStatus.CONFLICT, "이미 소유된 단축 URL 입니다"),
 	NOT_URL_OWNER("6004", HttpStatus.FORBIDDEN, "단축 URL의 소유자가 아닙니다"),
 
-	UNAUTHORIZED("7001", HttpStatus.UNAUTHORIZED, "인증이 필요합니다");
+	UNAUTHORIZED("7001", HttpStatus.UNAUTHORIZED, "인증이 필요합니다"),
 
+	TAG_NOT_FOUND("8001", HttpStatus.NOT_FOUND, "태그를 찾을 수 없습니다"),
+	DUPLICATE_TAG_NAME("8002", HttpStatus.CONFLICT, "이미 같은 이름의 태그가 존재합니다"),
+	NOT_TAG_OWNER("8003", HttpStatus.FORBIDDEN, "해당 태그의 소유자가 아닙니다"),
+	TAG_LIMIT_EXCEEDED("8004", HttpStatus.BAD_REQUEST, "태그 개수 제한을 초과했습니다 (최대 50개)");
 
 
 	private final String code;
