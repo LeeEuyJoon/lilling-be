@@ -5,6 +5,6 @@ import java.util.List;
 import luti.server.domain.model.UrlTag;
 
 public interface UrlTagReader {
-	List<UrlTag> findByUrlId(Long urlMappingId);
-	List<UrlTag> findByUrlMappingId(List<Long> urlMappingIds);
+	List<UrlTag> findByUrlMappingId(Long urlMappingId);
+	List<UrlTag> findByUrlMappingIdIn(List<Long> urlMappingIds);
 }

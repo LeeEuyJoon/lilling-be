@@ -17,12 +17,12 @@ public class UrlTagReaderImpl implements UrlTagReader {
 	}
 
 	@Override
-	public List<UrlTag> findByUrlId(Long urlMappingId) {
+	public List<UrlTag> findByUrlMappingId(Long urlMappingId) {
 		return urlTagRepository.findByUrlMapping_Id(urlMappingId);
 	}
 
 	@Override
-	public List<UrlTag> findByUrlMappingId(List<Long> urlMappingIds) {
+	public List<UrlTag> findByUrlMappingIdIn(List<Long> urlMappingIds) {
 		return urlTagRepository.findByUrlMapping_IdIn(urlMappingIds);
 	}
 }

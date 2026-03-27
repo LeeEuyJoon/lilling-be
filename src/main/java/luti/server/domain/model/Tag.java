@@ -41,6 +41,10 @@ public class Tag {
 		this.name = builder.name;
 	}
 
+	public static Builder builder() {
+		return new Builder();
+	}
+
 	public Long getId() { return id; }
 	public Member getMember() { return member; }
 	public String getName() { return name; }

@@ -1,8 +1,11 @@
 package luti.server.infrastructure.persistence;
 
+import org.springframework.stereotype.Component;
+
 import luti.server.domain.model.Tag;
 import luti.server.domain.port.TagStore;
 
+@Component
 public class TagStoreImpl implements TagStore {
 
 	private final TagRepository tagRepository;
