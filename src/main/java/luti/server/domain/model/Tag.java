@@ -11,27 +11,37 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@Table(
+	name = "tag",
+	indexes = { @Index(name = "idx_tag_member_id", columnList = "member_id") },
+	uniqueConstraints = { @UniqueConstraint(name = "uk_member_tag_name", columnNames = {"member_id", "name"}) }
+)
 public class Tag {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", nullable = false, updatable = false)
 	private Long id;
 
 	@ManyToOne(fetch = LAZY)
-	@Column(name = "member_id", nullable = false, updatable = false)
+	@JoinColumn(name = "member_id", nullable = false, updatable = false)
 	private Member member;
 
 	@Column(name = "name", nullable = false, length = 50)
 	private String name;
 
 	@CreatedDate
-	@Column(name = "color", nullable = false)
+	@Column(name = "created_at", updatable = false)
 	private LocalDateTime createdAt;
 
 	protected Tag() {}

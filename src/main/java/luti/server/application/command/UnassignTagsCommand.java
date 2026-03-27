@@ -14,6 +14,10 @@ public class UnassignTagsCommand {
 		this.tagIds = tagIds;
 	}
 
+	public static UnassignTagsCommand of(Long memberId, Long urlId, List<Long> tagIds) {
+		return new UnassignTagsCommand(memberId, urlId, tagIds);
+	}
+
 	public Long getMemberId() {
 		return memberId;
 	}

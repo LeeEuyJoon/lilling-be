@@ -99,6 +99,8 @@ public class SecurityConfig {
 			.authorizeHttpRequests(auth -> auth
 				// My URLs 관련 -> 인증 필요
 				.requestMatchers("/api/v1/my-urls/**").authenticated()
+				// 태그 관련 -> 인증 필요
+				.requestMatchers("/api/v1/tags/**").authenticated()
 
 				.anyRequest().permitAll()
 			);

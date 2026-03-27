@@ -1,4 +1,4 @@
-package luti.server.application.command;
+package luti.server.application.result;
 
 import java.util.List;
 
@@ -20,5 +20,4 @@ public class TagListResult {
 	public List<TagResult> getTags() {
 		return tags;
 	}
-
 }

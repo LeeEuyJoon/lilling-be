@@ -1,4 +1,4 @@
-package luti.server.application.command;
+package luti.server.application.result;
 
 import luti.server.domain.service.dto.TagInfo;
 

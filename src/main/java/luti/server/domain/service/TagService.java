@@ -67,14 +67,12 @@ public class TagService {
 		Member member = memberReader.findById(memberId)
 									.orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
-		Tag tag = Tag.builder()
-					   .member(member)
-					   .name(name)
-					   .build();
+		Tag saved = tagStore.save(Tag.builder()
+								   .member(member)
+								   .name(name)
+								   .build());
 
-		tagStore.save(tag);
-
-		return TagInfo.from(tag);
+		return TagInfo.from(saved);
 	}
 
 	@Transactional

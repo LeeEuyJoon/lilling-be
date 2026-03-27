@@ -14,6 +14,10 @@ public class AssignTagsCommand {
 		this.tagIds = tagIds;
 	}
 
+	public static AssignTagsCommand of(Long memberId, Long urlId, List<Long> tagIds) {
+		return new AssignTagsCommand(memberId, urlId, tagIds);
+	}
+
 	public Long getMemberId() {
 		return memberId;
 	}
