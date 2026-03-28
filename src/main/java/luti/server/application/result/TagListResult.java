@@ -8,7 +8,7 @@ public class TagListResult {
 
 	private final List<TagResult> tags;
 
-	public TagListResult(List<TagResult> tags) {
+	private TagListResult(List<TagResult> tags) {
 		this.tags = tags;
 	}
 

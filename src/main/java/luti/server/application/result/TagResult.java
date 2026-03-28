@@ -6,7 +6,7 @@ public class TagResult {
 	private final Long id;
 	private final String name;
 
-	public TagResult(Long id, String name) {
+	private TagResult(Long id, String name) {
 		this.id = id;
 		this.name = name;
 	}

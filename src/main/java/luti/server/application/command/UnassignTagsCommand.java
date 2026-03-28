@@ -8,7 +8,7 @@ public class UnassignTagsCommand {
 	private final Long urlId;
 	private final List<Long> tagIds;
 
-	public UnassignTagsCommand(Long memberId, Long urlId, List<Long> tagIds) {
+	private UnassignTagsCommand(Long memberId, Long urlId, List<Long> tagIds) {
 		this.memberId = memberId;
 		this.urlId = urlId;
 		this.tagIds = tagIds;

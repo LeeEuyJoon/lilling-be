@@ -2,12 +2,12 @@ package luti.server.application.command;
 
 public class UpdateTagCommand {
 
-	private final Long MemberId;
+	private final Long memberId;
 	private final Long tagId;
 	private final String name;
 
 	private UpdateTagCommand(Long memberId, Long tagId, String name) {
-		MemberId = memberId;
+		this.memberId = memberId;
 		this.tagId = tagId;
 		this.name = name;
 	}
@@ -17,7 +17,7 @@ public class UpdateTagCommand {
 	}
 
 	public Long getMemberId() {
-		return MemberId;
+		return memberId;
 	}
 
 	public Long getTagId() {

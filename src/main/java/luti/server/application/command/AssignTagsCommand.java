@@ -8,7 +8,7 @@ public class AssignTagsCommand {
 	private final Long urlId;
 	private final List<Long> tagIds;
 
-	public AssignTagsCommand(Long memberId, Long urlId, List<Long> tagIds) {
+	private AssignTagsCommand(Long memberId, Long urlId, List<Long> tagIds) {
 		this.memberId = memberId;
 		this.urlId = urlId;
 		this.tagIds = tagIds;
