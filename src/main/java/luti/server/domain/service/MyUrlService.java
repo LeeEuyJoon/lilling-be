@@ -38,12 +38,14 @@ public class MyUrlService {
 	}
 
 	@Transactional(readOnly = true)
-	public MyUrlsListInfo getMyUrls(Long memberId, Integer page, Integer size, List<Long> tagIds) {
+	public MyUrlsListInfo getMyUrls(Long memberId, Integer page, Integer size, List<Long> tagIds, boolean andMode) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
 		Page<UrlMapping> pageResult;
 		if (tagIds == null || tagIds.isEmpty()) {
 			pageResult = urlMappingReader.findByMemberId(memberId, pageable);
+		} else if (andMode) {
+			pageResult = urlMappingReader.findByMemberIdAndAllTagIds(memberId, tagIds, pageable);
 		} else {
 			pageResult = urlMappingReader.findByMemberIdAndTagIds(memberId, tagIds, pageable);
 		}

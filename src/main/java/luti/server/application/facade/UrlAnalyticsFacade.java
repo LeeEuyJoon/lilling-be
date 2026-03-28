@@ -48,7 +48,7 @@ public class UrlAnalyticsFacade {
 
 		// url 리스트 조회 (태그 필터링 분기는 MyUrlService 내부에서 처리)
 		MyUrlsListInfo urlsListInfo = myUrlService.getMyUrls(command.getMemberId(), command.getPage(),
-															 command.getSize(), command.getTagIds());
+															 command.getSize(), command.getTagIds(), command.isAndMode());
 
 		// 태그 조회
 		Map<Long, List<TagInfo>> tagsMap = tagService.getTagsForUrls(urlsListInfo.getUrlIds());

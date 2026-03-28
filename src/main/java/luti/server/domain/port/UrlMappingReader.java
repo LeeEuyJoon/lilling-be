@@ -17,4 +17,6 @@ public interface UrlMappingReader {
 	Page<UrlMapping> findByMemberId(Long memberId, Pageable pageable);
 
 	Page<UrlMapping> findByMemberIdAndTagIds(Long memberId, List<Long> tagIds, Pageable pageable);
+
+	Page<UrlMapping> findByMemberIdAndAllTagIds(Long memberId, List<Long> tagIds, Pageable pageable);
 }

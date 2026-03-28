@@ -59,4 +59,27 @@ public interface UrlMappingRepository extends JpaRepository<UrlMapping, Long> {
 											 @Param("tagIds") List<Long> tagIds,
 											 Pageable pageable);
 
+	@Query(
+		value = "SELECT u FROM UrlMapping u "
+			+ "WHERE u.member.id = :memberId "
+			+ "AND u.deletedAt IS NULL "
+			+ "AND :tagCount = ("
+			+     "SELECT COUNT(DISTINCT ut.tag.id) FROM UrlTag ut "
+			+     "WHERE ut.urlMapping.id = u.id "
+			+     "AND ut.tag.id IN :tagIds"
+			+ ") "
+			+ "ORDER BY u.createdAt DESC",
+		countQuery = "SELECT COUNT(u) FROM UrlMapping u "
+			+ "WHERE u.member.id = :memberId "
+			+ "AND u.deletedAt IS NULL "
+			+ "AND :tagCount = ("
+			+     "SELECT COUNT(DISTINCT ut.tag.id) FROM UrlTag ut "
+			+     "WHERE ut.urlMapping.id = u.id "
+			+     "AND ut.tag.id IN :tagIds"
+			+ ")"
+	)
+	Page<UrlMapping> findByMemberIdAndAllTagIds(@Param("memberId") Long memberId,
+												@Param("tagIds") List<Long> tagIds,
+												@Param("tagCount") Long tagCount,
+												Pageable pageable);
 }

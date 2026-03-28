@@ -38,4 +38,9 @@ public class UrlMappingReaderImpl implements UrlMappingReader {
 	public Page<UrlMapping> findByMemberIdAndTagIds(Long memberId, List<Long> tagIds, Pageable pageable) {
 		return repository.findByMemberIdAndTagIds(memberId, tagIds, pageable);
 	}
+
+	@Override
+	public Page<UrlMapping> findByMemberIdAndAllTagIds(Long memberId, List<Long> tagIds, Pageable pageable) {
+		return repository.findByMemberIdAndAllTagIds(memberId, tagIds, (long) tagIds.size(), pageable);
+	}
 }

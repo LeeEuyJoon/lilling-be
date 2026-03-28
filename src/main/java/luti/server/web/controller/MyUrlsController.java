@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import luti.server.application.command.UrlAnalyticsCommand;
-import luti.server.application.facade.MyUrlsFacade;
 import luti.server.application.command.ClaimUrlCommand;
 import luti.server.application.command.DeleteUrlCommand;
 import luti.server.application.command.DescriptionCommand;
@@ -70,9 +69,10 @@ public class MyUrlsController {
 	public ResponseEntity<MyUrlsListResponse> getMyUrls(@RequestParam(value = "page", defaultValue = "0") Integer page,
 														@RequestParam(value = "size", defaultValue = "10") Integer size,
 														@RequestParam(required = false) List<Long> tagIds,
+														@RequestParam(value = "filterMode", defaultValue = "or") String filterMode,
 														Authentication authentication) {
 
-		MyUrlsCommand command = MyUrlsCommandMapper.toCommand(page, size, authentication, tagIds);
+		MyUrlsCommand command = MyUrlsCommandMapper.toCommand(page, size, authentication, tagIds, filterMode);
 		MyUrlsListResult result = urlAnalyticsFacade.getMyUrls(command);
 		MyUrlsListResponse response = MyUrlsListResponse.from(result);
 
