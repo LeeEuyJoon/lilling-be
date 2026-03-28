@@ -4,12 +4,12 @@
 
 **🗓️ 기간:** 2025.10.25 ~　　|　　**👤 유형:** 개인 프로젝트　　|　　**🔗 상태:** 기능 확장중
 
-Little Linking의 의미를 담고 있는 Lilling 서비스는 URL Shortner 웹 프로그램입니다.  
-[「가상 면접 사례로 배우는 대규모 시스템 설계 기초」](https://product.kyobobook.co.kr/detail/S000001033116) 책의 8장 「URL 단축기 설계」 챕터에서 접한 아이디어를 출발점으로, 실제 서비스 시스템으로 구현하는 것을 목표로 합니다.
+Little Linking의 의미를 담고 있는 Lilling은 URL Shortener 웹 서비스입니다.    
+[「가상 면접 사례로 배우는 대규모 시스템 설계 기초」](https://product.kyobobook.co.kr/detail/S000001033116) 책의 8장 「URL 단축기 설계」 챕터에서 접한 아이디어를 출발점으로, URL 단축 서비스의 핵심 설계 요소를 실제로 구현하고, 사용자 관점의 기능 제공은 물론 성능과 확장성을 고려한 기술적 고민, 배포와 운영까지 포함한 하나의 서비스로 발전시키는 것을 목표로 개발하고 있습니다.
 
 <br>
 
-## 🔗 링크
+## 🔗 바로가기
 
 - 🌍 **서비스 바로가기** → [https://www.lill.ing](https://www.lill.ing)
 - ⚙️ **Backend Repository** → [https://github.com/LeeEuyJoon/lilling-be](https://github.com/LeeEuyJoon/lilling-be)
@@ -38,12 +38,6 @@ Little Linking의 의미를 담고 있는 Lilling 서비스는 URL Shortner 웹 
   </tr>
 </table>
 
-
-
-
-
-
-
 <br>
 
 # 📑 문서
@@ -64,6 +58,36 @@ Little Linking의 의미를 담고 있는 Lilling 서비스는 URL Shortner 웹 
 - [KGS 설계](https://github.com/LeeEuyJoon/lilling-be/wiki/KGS-(Key-Generation-Service)-%EC%84%A4%EA%B3%84)
 - [KGS 키 할당 테스트](https://github.com/LeeEuyJoon/lilling-be/wiki/KGS-%ED%82%A4-%ED%95%A0%EB%8B%B9-%ED%85%8C%EC%8A%A4%ED%8A%B8)
 
+<br>
+
+# 🆕 기능 업데이트 히스토리
+
+**2026-03-28**
+- MyURLs 태그 기능 추가
+- MyURLs 태그 기반 필터링 기능 추가
+
+**2026-02-28**
+- Keyword 기반 단축 기능 추가: 커스텀 short url 생성
+
+**2026-01-27**
+- URL 분석 기능 추가: 시간별 / 일별 / 주별 / 월별 통계
+
+**2026-01-22**
+- 미니 차트 기능 추가: 최근 일자별 클릭 수 추이 모니터링
+
+**2026-01-09**
+- Add Existing 기능 추가: 주인 없는 short url을 클레임 (회원가입 전 단축한 url 관리를 위한 등록)
+
+**2026-01-06**
+- 로그인 기능 추가: 구글 소셜 로그인
+
+**2025-11-04**
+- 리다이렉트 성능 개선
+
+**2025-10-27**
+- 출시: 기본 short url 생성 기능 제공
+
+<br>
 
 <!--
 
