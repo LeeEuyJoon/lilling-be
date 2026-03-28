@@ -3,9 +3,11 @@ package luti.server.application.result;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import luti.server.domain.service.dto.MyUrlsListInfo;
 import luti.server.domain.service.dto.RecentDailyStatisticsInfo;
+import luti.server.domain.service.dto.TagInfo;
 
 public class MyUrlsListResult {
 	private final List<MyUrlItemResult> urls;
@@ -24,9 +26,18 @@ public class MyUrlsListResult {
 	}
 
 	public static MyUrlsListResult from(MyUrlsListInfo urlsInfo, RecentDailyStatisticsInfo statsInfo) {
+		return from(urlsInfo, Map.of(), statsInfo);
+	}
+
+	public static MyUrlsListResult from(MyUrlsListInfo urlsInfo, Map<Long, List<TagInfo>> tagsMap,
+										RecentDailyStatisticsInfo statsInfo) {
 
 		List<MyUrlItemResult> items = urlsInfo.getUrls().stream()
 										.map(item -> {
+											// 태그 조회
+											List<TagInfo> tagInfos = tagsMap.getOrDefault(item.getId(), List.of());
+											List<TagResult> tags = tagInfos.stream().map(TagResult::from).toList();
+
 											// 해당 URL의 통계 조회
 											List<RecentDailyStatisticsInfo.DailyStat> stats =
 												statsInfo.getStatisticsForUrl(item.getId());
@@ -45,7 +56,6 @@ public class MyUrlsListResult {
 																									   ))
 																							   .toList();
 
-											// 통계 포함하여 MyUrlItemResult 생성
 											return MyUrlItemResult.of(
 												item.getId(),
 												item.getShortUrl(),
@@ -53,7 +63,8 @@ public class MyUrlsListResult {
 												item.getDescription(),
 												item.getCreatedAt(),
 												item.getClickCount(),
-												summaries
+												summaries,
+												tags
 											);
 										})
 										.toList();
@@ -75,9 +86,10 @@ public class MyUrlsListResult {
 		private final LocalDateTime createdAt;
 		private final Long clickCount;
 		private final List<DailyStatsSummaryResult> recentDailyStats;
+		private final List<TagResult> tags;
 
 		private MyUrlItemResult(Long id, String shortUrl, String originalUrl, String description, LocalDateTime createdAt,
-						  Long clickCount, List<DailyStatsSummaryResult> recentDailyStats) {
+						  Long clickCount, List<DailyStatsSummaryResult> recentDailyStats, List<TagResult> tags) {
 			this.id = id;
 			this.shortUrl = shortUrl;
 			this.originalUrl = originalUrl;
@@ -85,12 +97,13 @@ public class MyUrlsListResult {
 			this.createdAt = createdAt;
 			this.clickCount = clickCount;
 			this.recentDailyStats = recentDailyStats;
+			this.tags = tags;
 		}
 
 		public static MyUrlItemResult of(Long id, String shortUrl, String originalUrl, String description,
 								   LocalDateTime createdAt, Long clickCount,
-								   List<DailyStatsSummaryResult> recentDailyStats) {
-			return new MyUrlItemResult(id, shortUrl, originalUrl, description, createdAt, clickCount, recentDailyStats);
+								   List<DailyStatsSummaryResult> recentDailyStats, List<TagResult> tags) {
+			return new MyUrlItemResult(id, shortUrl, originalUrl, description, createdAt, clickCount, recentDailyStats, tags);
 		}
 
 		public Long getId() {
@@ -119,6 +132,10 @@ public class MyUrlsListResult {
 
 		public List<DailyStatsSummaryResult> getRecentDailyStats() {
 			return recentDailyStats;
+		}
+
+		public List<TagResult> getTags() {
+			return tags;
 		}
 
 		public static class DailyStatsSummaryResult {

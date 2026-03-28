@@ -1,5 +1,6 @@
 package luti.server.domain.port;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -14,4 +15,6 @@ public interface UrlMappingReader {
 	Optional<UrlMapping> findByScrambledId(Long scrambledId);
 
 	Page<UrlMapping> findByMemberId(Long memberId, Pageable pageable);
+
+	Page<UrlMapping> findByMemberIdAndTagIds(Long memberId, List<Long> tagIds, Pageable pageable);
 }

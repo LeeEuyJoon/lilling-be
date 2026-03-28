@@ -1,5 +1,7 @@
 package luti.server.web.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -67,9 +69,10 @@ public class MyUrlsController {
 	@GetMapping("/list")
 	public ResponseEntity<MyUrlsListResponse> getMyUrls(@RequestParam(value = "page", defaultValue = "0") Integer page,
 														@RequestParam(value = "size", defaultValue = "10") Integer size,
+														@RequestParam(required = false) List<Long> tagIds,
 														Authentication authentication) {
 
-		MyUrlsCommand command = MyUrlsCommandMapper.toCommand(page, size, authentication);
+		MyUrlsCommand command = MyUrlsCommandMapper.toCommand(page, size, authentication, tagIds);
 		MyUrlsListResult result = urlAnalyticsFacade.getMyUrls(command);
 		MyUrlsListResponse response = MyUrlsListResponse.from(result);
 

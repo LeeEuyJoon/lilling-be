@@ -18,6 +18,7 @@ public class MyUrlItemResponse {
 	private LocalDateTime createdAt;
 	private Long clickCount;
 	private List<DailyStatsSummaryResponse> recentDailyStats;
+	private List<TagResponse> tags;
 
 
 	public static MyUrlItemResponse from(MyUrlItemResult item) {
@@ -31,6 +32,7 @@ public class MyUrlItemResponse {
 		response.recentDailyStats = item.getRecentDailyStats().stream()
 										.map(DailyStatsSummaryResponse::from)
 										.toList();
+		response.tags = item.getTags().stream().map(TagResponse::from).toList();
 		return response;
 	}
 
@@ -60,6 +62,10 @@ public class MyUrlItemResponse {
 
 	public List<DailyStatsSummaryResponse> getRecentDailyStats() {
 		return recentDailyStats;
+	}
+
+	public List<TagResponse> getTags() {
+		return tags;
 	}
 
 	public static class DailyStatsSummaryResponse {

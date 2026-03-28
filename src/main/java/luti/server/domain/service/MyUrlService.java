@@ -2,6 +2,8 @@ package luti.server.domain.service;
 
 import static luti.server.exception.ErrorCode.*;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,14 +38,16 @@ public class MyUrlService {
 	}
 
 	@Transactional(readOnly = true)
-	public MyUrlsListInfo getMyUrls(Long memberId, Integer page, Integer size) {
-		// PageRequest 생성
+	public MyUrlsListInfo getMyUrls(Long memberId, Integer page, Integer size, List<Long> tagIds) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
-		// Repository 호출 -> Page<UrlMapping> 반환
-		Page<UrlMapping> pageResult = urlMappingReader.findByMemberId(memberId, pageable);
+		Page<UrlMapping> pageResult;
+		if (tagIds == null || tagIds.isEmpty()) {
+			pageResult = urlMappingReader.findByMemberId(memberId, pageable);
+		} else {
+			pageResult = urlMappingReader.findByMemberIdAndTagIds(memberId, tagIds, pageable);
+		}
 
-		// Page<UrlMapping> → MyUrlsListInfo 변환
 		return MyUrlsListInfo.from(pageResult);
 	}
 

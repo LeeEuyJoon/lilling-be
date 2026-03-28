@@ -1,5 +1,6 @@
 package luti.server.infrastructure.persistence;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -31,5 +32,10 @@ public class UrlMappingReaderImpl implements UrlMappingReader {
 	@Override
 	public Page<UrlMapping> findByMemberId(Long memberId, Pageable pageable) {
 		return repository.findByMember_IdAndDeletedAtIsNullOrderByCreatedAtDesc(memberId, pageable);
+	}
+
+	@Override
+	public Page<UrlMapping> findByMemberIdAndTagIds(Long memberId, List<Long> tagIds, Pageable pageable) {
+		return repository.findByMemberIdAndTagIds(memberId, tagIds, pageable);
 	}
 }
