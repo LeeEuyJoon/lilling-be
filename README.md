@@ -29,14 +29,16 @@ Little Linking의 의미를 담고 있는 Lilling은 URL Shortener 웹 서비스
       <img width="100%" height="1180" alt="스크린샷 2026-03-02 오후 6 51 01" src="https://github.com/user-attachments/assets/77a7c351-87f3-465d-a73e-514cddd4dbec" />
     </td>
     <td>
-      <img width="100%" height="1180" alt="스크린샷 2026-03-02 오후 6 53 01" src="https://github.com/user-attachments/assets/2fc33164-3bac-40d3-9810-fec09ebebb4d" />
+      <img width="100%" height="1180" alt="스크린샷 2026-03-02 오후 6 53 01" src="https://github.com/user-attachments/assets/ab81bd27-170e-4697-b868-b391dc8ece25" />
     </td>
         <td>
 
-<img width="1822" height="1180" alt="스크린샷 2026-03-02 오후 6 52 34" src="https://github.com/user-attachments/assets/7282ea3f-60d6-4599-a127-afe25427962d" />
+<img width="1822" height="1180" alt="스크린샷 2026-03-02 오후 6 52 34" src="https://github.com/user-attachments/assets/5cb8a003-31b3-4cd2-9d33-9e904097f2f2" />
     </td>
   </tr>
 </table>
+
+
 
 <br>
 
