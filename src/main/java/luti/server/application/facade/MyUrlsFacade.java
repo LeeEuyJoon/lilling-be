@@ -74,7 +74,7 @@ public class MyUrlsFacade {
 
 		// url 리스트 조회
 		MyUrlsListInfo urlsListInfo = myUrlService.getMyUrls(command.getMemberId(), command.getPage(),
-															 command.getSize(), command.getTagIds());
+															 command.getSize(), command.getTagIds(), command.isAndMode());
 
 		// url 리스트 id로 최근 일별 통계 조회
 		RecentDailyStatisticsInfo recentDailyStatisticsInfo = clickStatisticsService.getRecentDailyStatistics(
