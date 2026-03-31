@@ -489,7 +489,7 @@ class UrlShortenIntegrationTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestBody))
 			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.code").value("INVALID_KEYWORD_FORMAT"))
+			.andExpect(jsonPath("$.code").value("3207"))
 			.andExpect(jsonPath("$.message").exists());
 
 		// DB에 저장되지 않아야 함
@@ -514,7 +514,7 @@ class UrlShortenIntegrationTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestBody))
 			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.code").value("INVALID_KEYWORD_FORMAT"))
+			.andExpect(jsonPath("$.code").value("3207"))
 			.andExpect(jsonPath("$.message").exists());
 
 		// DB에 저장되지 않아야 함
@@ -539,7 +539,7 @@ class UrlShortenIntegrationTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestBody))
 			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.code").value("INVALID_KEYWORD_FORMAT"))
+			.andExpect(jsonPath("$.code").value("3207"))
 			.andExpect(jsonPath("$.message").exists());
 
 		// DB에 저장되지 않아야 함

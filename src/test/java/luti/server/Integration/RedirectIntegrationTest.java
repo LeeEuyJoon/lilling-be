@@ -212,7 +212,7 @@ class RedirectIntegrationTest {
 		mockMvc.perform(get("/" + nonExistentShortCode)
 				.accept(MediaType.APPLICATION_JSON))  // JSON 응답 기대
 			.andExpect(status().isNotFound())  // 404 NOT FOUND
-			.andExpect(jsonPath("$.code").value("URL_NOT_FOUND"))
+			.andExpect(jsonPath("$.code").value("2001"))
 			.andExpect(jsonPath("$.message").exists());
 
 		System.out.println("✅ 존재하지 않는 URL 예외 처리 확인 (404 + JSON 응답)");
