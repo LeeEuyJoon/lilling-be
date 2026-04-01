@@ -57,7 +57,9 @@ public class UrlAnalyticsFacade {
 		RecentDailyStatisticsInfo recentDailyStatisticsInfo = clickStatisticsService.getRecentDailyStatistics(
 			urlsListInfo.getUrlIds());
 
-		return MyUrlsListResult.from(urlsListInfo, tagsMap, recentDailyStatisticsInfo);
+		MyUrlsListResult result = MyUrlsListResult.from(urlsListInfo, tagsMap, recentDailyStatisticsInfo);
+
+		return result;
 	}
 
 	/**
@@ -69,6 +71,8 @@ public class UrlAnalyticsFacade {
 
 		UrlAnalyticsInfo analyticsInfo = urlAnalyticsService.getAnalytics(command.getUrlMappingId(), command.getMemberId());
 
-		return UrlAnalyticsResult.from(analyticsInfo);
+		UrlAnalyticsResult result = UrlAnalyticsResult.from(analyticsInfo);
+
+		return result;
 	}
 }

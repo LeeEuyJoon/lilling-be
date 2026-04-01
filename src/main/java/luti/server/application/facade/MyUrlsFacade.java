@@ -80,7 +80,9 @@ public class MyUrlsFacade {
 		RecentDailyStatisticsInfo recentDailyStatisticsInfo = clickStatisticsService.getRecentDailyStatistics(
 			urlsListInfo.getUrlIds());
 
-		return MyUrlsListResult.from(urlsListInfo, recentDailyStatisticsInfo);
+		MyUrlsListResult result = MyUrlsListResult.from(urlsListInfo, recentDailyStatisticsInfo);
+
+		return result;
 	}
 
 	public void updateDescription(DescriptionCommand command) {
@@ -104,7 +106,9 @@ public class MyUrlsFacade {
 
 		UrlAnalyticsInfo analyticsInfo = urlAnalyticsService.getAnalytics(command.getUrlMappingId(), command.getMemberId());
 
-		return UrlAnalyticsResult.from(analyticsInfo);
+		UrlAnalyticsResult result = UrlAnalyticsResult.from(analyticsInfo);
+
+		return result;
 	}
 
 }

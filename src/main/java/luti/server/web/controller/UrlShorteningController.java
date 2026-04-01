@@ -30,6 +30,8 @@ public class UrlShorteningController {
 		ShortenUrlCommand command = ShortenUrlCommandMapper.toCommand(request, authentication);
 		ShortenUrlResult result = urlShorteningFacade.shortenUrl(command);
 
-		return ResponseEntity.ok(ShortenResponse.from(result));
+		ShortenResponse response = ShortenResponse.from(result);
+
+		return ResponseEntity.ok(response);
 	}
 }

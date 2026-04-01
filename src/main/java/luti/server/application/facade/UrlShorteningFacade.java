@@ -48,12 +48,16 @@ public class UrlShorteningFacade {
 
 		if (hasKeyword(command)) {
 			shortenedUrl = shortenWithKeyword(command);
-			return ShortenUrlResult.of(shortenedUrl);
+			ShortenUrlResult result = ShortenUrlResult.of(shortenedUrl);
+
+			return result;
 		}
 
 		if (!hasKeyword(command)) {
 			shortenedUrl = shortenAuto(command);
-			return ShortenUrlResult.of(shortenedUrl);
+			ShortenUrlResult result = ShortenUrlResult.of(shortenedUrl);
+
+			return result;
 		}
 
 		throw new IllegalStateException("unreachable");
