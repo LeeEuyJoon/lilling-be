@@ -114,14 +114,9 @@ public class TagService {
 	@Transactional
 	public void assignTags(Long memberId, Long urlId, List<Long> tagIds) {
 
-		// UrlMapping 조회
+		// // UrlMapping 조회
 		UrlMapping urlMapping  = urlMappingReader.findById(urlId)
 			.orElseThrow(() -> new BusinessException(SHORT_URL_NOT_FOUND));
-
-		// 소유자 확인
-		if (!urlMapping.getMember().getId().equals(memberId)) {
-			throw new BusinessException(NOT_URL_OWNER);
-		}
 
 		// 태그 조회 및 소유자 확인
 		List<Tag> tags = tagIds.stream().map(tagId -> {
@@ -151,16 +146,7 @@ public class TagService {
 	@Transactional
 	public void unassignTags(Long memberId, Long urlId, List<Long> tagIds) {
 
-		// UrlMapping 조회
-		UrlMapping urlMapping = urlMappingReader.findById(urlId)
-			.orElseThrow(() -> new BusinessException(SHORT_URL_NOT_FOUND));
-
-		// 소유자 확인
-		if (!urlMapping.getMember().getId().equals(memberId)) {
-			throw new BusinessException(NOT_URL_OWNER);
-		}
-
-		// 태그 조회 및 소유자 확인
+		// 태그 할당 해제
 		urlTagStore.deleteByUrlMappingIdAndTagIdIn(urlId, tagIds);
 	}
 

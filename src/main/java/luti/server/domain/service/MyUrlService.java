@@ -79,4 +79,11 @@ public class MyUrlService {
 
 		urlMappingStore.deleteById(urlId);
 	}
+
+	@Transactional(readOnly = true)
+	public boolean isUrlOwnedByMember(Long urlId, Long memberId) {
+		return urlMappingReader.findById(urlId)
+							   .map(um -> um.getMember().getId().equals(memberId))
+							   .orElseThrow(() -> new BusinessException(URL_NOT_FOUND));
+	}
 }
