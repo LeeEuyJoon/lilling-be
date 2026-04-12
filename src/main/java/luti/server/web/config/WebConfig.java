@@ -1,16 +1,27 @@
 package luti.server.web.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import org.springframework.beans.factory.annotation.Value;
+
+import luti.server.web.resolver.CommandArgumentResolver;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
 	@Value("${CROSS_ORIGIN}")
 	private String crossOrigin;
+
+	private final CommandArgumentResolver commandArgumentResolver;
+
+	public WebConfig(CommandArgumentResolver commandArgumentResolver) {
+		this.commandArgumentResolver = commandArgumentResolver;
+	}
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
@@ -23,6 +34,11 @@ public class WebConfig implements WebMvcConfigurer {
 			.allowedHeaders("*")
 			.allowCredentials(false)
 			.maxAge(3600);
+	}
+
+	@Override
+	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+		resolvers.add(commandArgumentResolver);
 	}
 
 }
