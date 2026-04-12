@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-import luti.server.application.command.CreateTagCommand;
+import luti.server.application.command.legacy.CreateTagCommand;
 import luti.server.application.facade.TagFacade;
 import luti.server.web.dto.request.AssignTagsRequest;
 import luti.server.web.dto.request.CreateTagRequest;

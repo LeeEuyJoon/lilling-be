@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import luti.server.application.command.UrlAnalyticsCommand;
-import luti.server.application.command.ClaimUrlCommand;
-import luti.server.application.command.DeleteUrlCommand;
-import luti.server.application.command.DescriptionCommand;
-import luti.server.application.command.MyUrlsCommand;
+import luti.server.application.command.legacy.UrlAnalyticsCommand;
+import luti.server.application.command.legacy.ClaimUrlCommand;
+import luti.server.application.command.legacy.DeleteUrlCommand;
+import luti.server.application.command.legacy.DescriptionCommand;
+import luti.server.application.command.legacy.MyUrlsCommand;
 import luti.server.application.facade.UrlAnalyticsFacade;
 import luti.server.application.facade.UrlManagementFacade;
 import luti.server.application.result.MyUrlsListResult;

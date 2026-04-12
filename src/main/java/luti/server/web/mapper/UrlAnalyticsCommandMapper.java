@@ -4,7 +4,7 @@ import static luti.server.web.mapper.AuthExtractor.*;
 
 import org.springframework.security.core.Authentication;
 
-import luti.server.application.command.UrlAnalyticsCommand;
+import luti.server.application.command.legacy.UrlAnalyticsCommand;
 
 public class UrlAnalyticsCommandMapper {
 

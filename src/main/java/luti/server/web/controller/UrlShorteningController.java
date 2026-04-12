@@ -1,37 +1,28 @@
 package luti.server.web.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import luti.server.application.facade.UrlShorteningFacade;
+import luti.server.application.bus.CommandBus;
 import luti.server.application.command.ShortenUrlCommand;
-import luti.server.application.result.ShortenUrlResult;
-import luti.server.web.dto.request.ShortenRequest;
 import luti.server.web.dto.response.ShortenResponse;
-import luti.server.web.mapper.ShortenUrlCommandMapper;
+import luti.server.web.resolver.ResolveCommand;
 
 @RestController
 @RequestMapping("/api/v1/url")
 public class UrlShorteningController {
 
-	private final UrlShorteningFacade urlShorteningFacade;
+	private final CommandBus commandBus;
 
-	public UrlShorteningController(UrlShorteningFacade urlShorteningFacade) {
-		this.urlShorteningFacade = urlShorteningFacade;
+	public UrlShorteningController(CommandBus commandBus) {
+		this.commandBus = commandBus;
 	}
 
 	@PostMapping("/shorten")
-	public ResponseEntity<ShortenResponse> shortenUrl(@RequestBody ShortenRequest request, Authentication authentication) {
+	public ResponseEntity<ShortenResponse> shortenUrl(@ResolveCommand ShortenUrlCommand command) {
 
-		ShortenUrlCommand command = ShortenUrlCommandMapper.toCommand(request, authentication);
-		ShortenUrlResult result = urlShorteningFacade.shortenUrl(command);
-
-		ShortenResponse response = ShortenResponse.from(result);
-
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(ShortenResponse.from(commandBus.execute(command)));
 	}
 }

@@ -4,7 +4,7 @@ import static luti.server.web.mapper.AuthExtractor.*;
 
 import org.springframework.security.core.Authentication;
 
-import luti.server.application.command.DescriptionCommand;
+import luti.server.application.command.legacy.DescriptionCommand;
 import luti.server.web.dto.request.DescriptionRequest;
 
 public class DescriptionCommandMapper {

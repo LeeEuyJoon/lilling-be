@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.springframework.security.core.Authentication;
 
-import luti.server.application.command.MyUrlsCommand;
+import luti.server.application.command.legacy.MyUrlsCommand;
 
 public class MyUrlsCommandMapper {
 	public static MyUrlsCommand toCommand(Integer page, Integer size, Authentication authentication, List<Long> tagIds, String filterMode) {

@@ -4,11 +4,11 @@ import static luti.server.web.mapper.AuthExtractor.*;
 
 import org.springframework.security.core.Authentication;
 
-import luti.server.application.command.AssignTagsCommand;
-import luti.server.application.command.CreateTagCommand;
-import luti.server.application.command.DeleteTagCommand;
-import luti.server.application.command.UnassignTagsCommand;
-import luti.server.application.command.UpdateTagCommand;
+import luti.server.application.command.legacy.AssignTagsCommand;
+import luti.server.application.command.legacy.CreateTagCommand;
+import luti.server.application.command.legacy.DeleteTagCommand;
+import luti.server.application.command.legacy.UnassignTagsCommand;
+import luti.server.application.command.legacy.UpdateTagCommand;
 import luti.server.web.dto.request.AssignTagsRequest;
 import luti.server.web.dto.request.CreateTagRequest;
 import luti.server.web.dto.request.UnassignTagsRequest;

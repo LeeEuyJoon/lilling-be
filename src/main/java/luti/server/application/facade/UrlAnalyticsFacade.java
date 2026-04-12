@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
-import luti.server.application.command.MyUrlsCommand;
-import luti.server.application.command.UrlAnalyticsCommand;
+import luti.server.application.command.legacy.MyUrlsCommand;
+import luti.server.application.command.legacy.UrlAnalyticsCommand;
 import luti.server.application.result.MyUrlsListResult;
 import luti.server.application.result.UrlAnalyticsResult;
 import luti.server.domain.service.ClickStatisticsService;

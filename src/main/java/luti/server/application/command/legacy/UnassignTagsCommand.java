@@ -1,4 +1,4 @@
-package luti.server.application.command;
+package luti.server.application.command.legacy;
 
 import java.util.List;
 

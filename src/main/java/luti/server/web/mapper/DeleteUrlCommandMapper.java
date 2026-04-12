@@ -2,7 +2,7 @@ package luti.server.web.mapper;
 
 import org.springframework.security.core.Authentication;
 
-import luti.server.application.command.DeleteUrlCommand;
+import luti.server.application.command.legacy.DeleteUrlCommand;
 
 public class DeleteUrlCommandMapper {
 

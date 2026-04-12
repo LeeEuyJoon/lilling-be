@@ -4,9 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import luti.server.application.command.ClaimUrlCommand;
-import luti.server.application.command.DeleteUrlCommand;
-import luti.server.application.command.DescriptionCommand;
+import luti.server.application.command.legacy.ClaimUrlCommand;
+import luti.server.application.command.legacy.DeleteUrlCommand;
+import luti.server.application.command.legacy.DescriptionCommand;
 import luti.server.application.result.UrlVerifyResult;
 import luti.server.application.validation.UrlValidation.v2.UrlValidationChainBuilder;
 import luti.server.application.validation.UrlValidation.v2.UrlValidationContext;

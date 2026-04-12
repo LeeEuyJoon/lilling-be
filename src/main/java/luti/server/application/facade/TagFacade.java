@@ -6,13 +6,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import luti.server.application.command.AssignTagsCommand;
-import luti.server.application.command.CreateTagCommand;
-import luti.server.application.command.DeleteTagCommand;
+import luti.server.application.command.legacy.AssignTagsCommand;
+import luti.server.application.command.legacy.CreateTagCommand;
+import luti.server.application.command.legacy.DeleteTagCommand;
 import luti.server.application.result.TagListResult;
 import luti.server.application.result.TagResult;
-import luti.server.application.command.UnassignTagsCommand;
-import luti.server.application.command.UpdateTagCommand;
+import luti.server.application.command.legacy.UnassignTagsCommand;
+import luti.server.application.command.legacy.UpdateTagCommand;
 import luti.server.domain.service.MyUrlService;
 import luti.server.domain.service.TagService;
 import luti.server.domain.service.dto.TagInfo;
