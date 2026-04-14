@@ -13,34 +13,38 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import luti.server.application.bus.CommandBus;
+import luti.server.application.bus.QueryBus;
 import luti.server.application.command.legacy.CreateTagCommand;
 import luti.server.application.facade.TagFacade;
+import luti.server.application.query.TagListQuery;
+import luti.server.application.result.TagListResult;
 import luti.server.web.dto.request.AssignTagsRequest;
 import luti.server.web.dto.request.CreateTagRequest;
 import luti.server.web.dto.request.UnassignTagsRequest;
 import luti.server.web.dto.request.UpdateTagRequest;
-import luti.server.web.dto.response.TagListResponse;
 import luti.server.web.dto.response.TagResponse;
-import luti.server.web.mapper.AuthExtractor;
 import luti.server.web.mapper.TagCommandMapper;
+import luti.server.web.resolver.ResolveQuery;
 
 @RestController
 @RequestMapping("/api/v1/tags")
 public class TagController {
 
 	private final TagFacade tagFacade;
+	private final CommandBus commandBus;
+	private final QueryBus queryBus;
 
-	public TagController(TagFacade tagFacade) {
+	public TagController(TagFacade tagFacade, CommandBus commandBus, QueryBus queryBus) {
 		this.tagFacade = tagFacade;
+		this.commandBus = commandBus;
+		this.queryBus = queryBus;
 	}
 
 	@GetMapping
-	public ResponseEntity<TagListResponse> getTags(Authentication authentication) {
+	public TagListResult getTags(@ResolveQuery TagListQuery query) {
 
-		Long memberId = AuthExtractor.extractMemberId(authentication);
-		TagListResponse response = TagListResponse.from(tagFacade.getTags(memberId));
-
-		return ResponseEntity.ok(response);
+		return queryBus.execute(query);
 	}
 
 	@PostMapping
