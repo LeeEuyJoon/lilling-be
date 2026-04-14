@@ -9,12 +9,15 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.servlet.http.HttpServletRequest;
 import luti.server.web.mapper.AuthExtractor;
+import org.springframework.web.servlet.HandlerMapping;
 
 @Component
 public class CommandArgumentResolver implements HandlerMethodArgumentResolver {
@@ -48,6 +51,16 @@ public class CommandArgumentResolver implements HandlerMethodArgumentResolver {
 		// memberId JSON에 병합
 		if (jsonNode instanceof ObjectNode objectNode && memberId != null) {
 			objectNode.put("memberId", memberId);
+		}
+
+		// path variables JSON에 병합
+		if (jsonNode instanceof ObjectNode objectNode) {
+			@SuppressWarnings("unchecked")
+			Map<String, String> pathVars = (Map<String, String>)
+				request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+			if (pathVars != null) {
+				pathVars.forEach(objectNode::put);
+			}
 		}
 
 		return objectMapper.treeToValue(jsonNode, parameter.getParameterType());

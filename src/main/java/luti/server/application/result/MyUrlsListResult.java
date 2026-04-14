@@ -36,7 +36,7 @@ public class MyUrlsListResult {
 										.map(item -> {
 											// 태그 조회
 											List<TagInfo> tagInfos = tagsMap.getOrDefault(item.getId(), List.of());
-											List<TagResult> tags = tagInfos.stream().map(TagResult::from).toList();
+											List<CreateTagResult> tags = tagInfos.stream().map(CreateTagResult::from).toList();
 
 											// 해당 URL의 통계 조회
 											List<RecentDailyStatisticsInfo.DailyStat> stats =
@@ -86,10 +86,10 @@ public class MyUrlsListResult {
 		private final LocalDateTime createdAt;
 		private final Long clickCount;
 		private final List<DailyStatsSummaryResult> recentDailyStats;
-		private final List<TagResult> tags;
+		private final List<CreateTagResult> tags;
 
 		private MyUrlItemResult(Long id, String shortUrl, String originalUrl, String description, LocalDateTime createdAt,
-						  Long clickCount, List<DailyStatsSummaryResult> recentDailyStats, List<TagResult> tags) {
+						  Long clickCount, List<DailyStatsSummaryResult> recentDailyStats, List<CreateTagResult> tags) {
 			this.id = id;
 			this.shortUrl = shortUrl;
 			this.originalUrl = originalUrl;
@@ -102,7 +102,7 @@ public class MyUrlsListResult {
 
 		public static MyUrlItemResult of(Long id, String shortUrl, String originalUrl, String description,
 								   LocalDateTime createdAt, Long clickCount,
-								   List<DailyStatsSummaryResult> recentDailyStats, List<TagResult> tags) {
+								   List<DailyStatsSummaryResult> recentDailyStats, List<CreateTagResult> tags) {
 			return new MyUrlItemResult(id, shortUrl, originalUrl, description, createdAt, clickCount, recentDailyStats, tags);
 		}
 
@@ -134,7 +134,7 @@ public class MyUrlsListResult {
 			return recentDailyStats;
 		}
 
-		public List<TagResult> getTags() {
+		public List<CreateTagResult> getTags() {
 			return tags;
 		}
 

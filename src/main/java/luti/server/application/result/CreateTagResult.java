@@ -2,17 +2,17 @@ package luti.server.application.result;
 
 import luti.server.domain.service.dto.TagInfo;
 
-public class TagResult {
+public class CreateTagResult {
 	private final Long id;
 	private final String name;
 
-	private TagResult(Long id, String name) {
+	private CreateTagResult(Long id, String name) {
 		this.id = id;
 		this.name = name;
 	}
 
-	public static TagResult from(TagInfo tagInfo) {
-		return new TagResult(tagInfo.getId(), tagInfo.getName());
+	public static CreateTagResult from(TagInfo tagInfo) {
+		return new CreateTagResult(tagInfo.getId(), tagInfo.getName());
 	}
 
 	public Long getId() {

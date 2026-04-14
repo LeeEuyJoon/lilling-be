@@ -6,18 +6,18 @@ import luti.server.domain.service.dto.TagInfo;
 
 public class TagListResult {
 
-	private final List<TagResult> tags;
+	private final List<CreateTagResult> tags;
 
-	private TagListResult(List<TagResult> tags) {
+	private TagListResult(List<CreateTagResult> tags) {
 		this.tags = tags;
 	}
 
 	public static TagListResult from(List<TagInfo> tagInfos) {
-		List<TagResult> tags = tagInfos.stream().map(TagResult::from).toList();
+		List<CreateTagResult> tags = tagInfos.stream().map(CreateTagResult::from).toList();
 		return new TagListResult(tags);
 	}
 
-	public List<TagResult> getTags() {
+	public List<CreateTagResult> getTags() {
 		return tags;
 	}
 }
