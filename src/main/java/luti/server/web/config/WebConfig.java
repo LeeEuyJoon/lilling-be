@@ -10,6 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.beans.factory.annotation.Value;
 
 import luti.server.web.resolver.CommandArgumentResolver;
+import luti.server.web.resolver.QueryArgumentResolver;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -18,9 +19,11 @@ public class WebConfig implements WebMvcConfigurer {
 	private String crossOrigin;
 
 	private final CommandArgumentResolver commandArgumentResolver;
+	private final QueryArgumentResolver queryArgumentResolver;
 
-	public WebConfig(CommandArgumentResolver commandArgumentResolver) {
+	public WebConfig(CommandArgumentResolver commandArgumentResolver, QueryArgumentResolver queryArgumentResolver) {
 		this.commandArgumentResolver = commandArgumentResolver;
+		this.queryArgumentResolver = queryArgumentResolver;
 	}
 
 	@Override
@@ -39,6 +42,7 @@ public class WebConfig implements WebMvcConfigurer {
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
 		resolvers.add(commandArgumentResolver);
+		resolvers.add(queryArgumentResolver);
 	}
 
 }

@@ -1,18 +1,24 @@
 package luti.server.application.command.legacy;
 
-public class DescriptionCommand {
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import luti.server.application.command.ICommand;
+
+public class DescriptionCommand implements ICommand<Void> {
+
 	private final Long urlId;
 	private final Long memberId;
 	private final String description;
 
-	private DescriptionCommand(Long urlId, Long memberId, String description) {
+	@JsonCreator
+	public DescriptionCommand(
+						@JsonProperty("urlId") Long urlId,
+						@JsonProperty("memberId") Long memberId,
+						@JsonProperty("description") String description) {
 		this.urlId = urlId;
 		this.memberId = memberId;
 		this.description = description;
-	}
-
-	public static DescriptionCommand of(Long urlId, Long memberId, String description) {
-		return new DescriptionCommand(urlId, memberId, description);
 	}
 
 	public Long getUrlId() {

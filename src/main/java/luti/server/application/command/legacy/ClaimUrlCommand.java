@@ -1,17 +1,21 @@
 package luti.server.application.command.legacy;
 
-public class ClaimUrlCommand {
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import luti.server.application.command.ICommand;
+
+public class ClaimUrlCommand implements ICommand<Void> {
 
 	private final Long memberId;
 	private final String shortUrl;
 
-	private ClaimUrlCommand(Long memberId, String shortUrl) {
+	@JsonCreator
+	public ClaimUrlCommand(
+						@JsonProperty("memberId") Long memberId,
+						@JsonProperty("shortUrl") String shortUrl) {
 		this.memberId = memberId;
 		this.shortUrl = shortUrl;
-	}
-
-	public static ClaimUrlCommand of(Long memberId, String shortUrl) {
-		return new ClaimUrlCommand(memberId, shortUrl);
 	}
 
 	public Long getMemberId() {

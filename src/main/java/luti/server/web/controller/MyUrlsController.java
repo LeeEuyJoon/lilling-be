@@ -1,110 +1,70 @@
 package luti.server.web.controller;
 
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import luti.server.application.command.legacy.UrlAnalyticsCommand;
+import luti.server.application.bus.CommandBus;
+import luti.server.application.bus.QueryBus;
 import luti.server.application.command.legacy.ClaimUrlCommand;
 import luti.server.application.command.legacy.DeleteUrlCommand;
 import luti.server.application.command.legacy.DescriptionCommand;
-import luti.server.application.command.legacy.MyUrlsCommand;
-import luti.server.application.facade.UrlAnalyticsFacade;
-import luti.server.application.facade.UrlManagementFacade;
+import luti.server.application.query.MyUrlsQuery;
+import luti.server.application.query.UrlAnalyticsQuery;
+import luti.server.application.query.VerifyUrlQuery;
 import luti.server.application.result.MyUrlsListResult;
 import luti.server.application.result.UrlAnalyticsResult;
 import luti.server.application.result.UrlVerifyResult;
-import luti.server.web.dto.request.DescriptionRequest;
-import luti.server.web.dto.response.UrlAnalyticsResponse;
-import luti.server.web.mapper.DeleteUrlCommandMapper;
-import luti.server.web.mapper.DescriptionCommandMapper;
-import luti.server.web.mapper.MyUrlsCommandMapper;
-import luti.server.web.dto.request.ClaimRequest;
-import luti.server.web.dto.response.MyUrlsListResponse;
-import luti.server.web.dto.response.VerifyUrlResponse;
-import luti.server.web.mapper.ClaimUrlCommandMapper;
-import luti.server.web.mapper.UrlAnalyticsCommandMapper;
+import luti.server.web.resolver.ResolveCommand;
+import luti.server.web.resolver.ResolveQuery;
 
 @RestController
 @RequestMapping("/api/v1/my-urls")
 public class MyUrlsController {
 
-	private final UrlManagementFacade urlManagementFacade;
-	private final UrlAnalyticsFacade urlAnalyticsFacade;
+	private final CommandBus commandBus;
+	private final QueryBus queryBus;
 
-	public MyUrlsController(UrlManagementFacade urlManagementFacade, UrlAnalyticsFacade urlAnalyticsFacade) {
-		this.urlManagementFacade = urlManagementFacade;
-		this.urlAnalyticsFacade = urlAnalyticsFacade;
+	public MyUrlsController(CommandBus commandBus, QueryBus queryBus) {
+		this.commandBus = commandBus;
+		this.queryBus = queryBus;
 	}
 
 	@GetMapping("/verify")
-	public ResponseEntity<VerifyUrlResponse> verify(@RequestParam("shortUrl") String shortUrl) {
-
-		UrlVerifyResult verifyResult = urlManagementFacade.verify(shortUrl);
-		VerifyUrlResponse response = VerifyUrlResponse.from(verifyResult);
-
-		return ResponseEntity.ok(response);
+	public UrlVerifyResult verify(@ResolveQuery VerifyUrlQuery query) {
+		return queryBus.execute(query);
 	}
 
 	@PostMapping("/claim")
-	public ResponseEntity<Void> claimUrl(@RequestBody ClaimRequest request, Authentication authentication) {
-
-		ClaimUrlCommand command = ClaimUrlCommandMapper.toCommand(request, authentication);
-		urlManagementFacade.claimUrl(command);
-
-		return ResponseEntity.noContent().build();
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void claimUrl(@ResolveCommand ClaimUrlCommand command) {
+		commandBus.execute(command);
 	}
 
 	@GetMapping("/list")
-	public ResponseEntity<MyUrlsListResponse> getMyUrls(@RequestParam(value = "page", defaultValue = "0") Integer page,
-														@RequestParam(value = "size", defaultValue = "10") Integer size,
-														@RequestParam(required = false) List<Long> tagIds,
-														@RequestParam(value = "filterMode", defaultValue = "or") String filterMode,
-														Authentication authentication) {
-
-		MyUrlsCommand command = MyUrlsCommandMapper.toCommand(page, size, authentication, tagIds, filterMode);
-		MyUrlsListResult result = urlAnalyticsFacade.getMyUrls(command);
-		MyUrlsListResponse response = MyUrlsListResponse.from(result);
-
-		return ResponseEntity.ok(response);
+	public MyUrlsListResult getMyUrls(@ResolveQuery MyUrlsQuery query) {
+		return queryBus.execute(query);
 	}
 
 	@PatchMapping("/description")
-	public ResponseEntity<Void> updateDescription(@RequestBody DescriptionRequest request,
-												  Authentication authentication) {
-
-		DescriptionCommand command = DescriptionCommandMapper.toCommand(request, authentication);
-		urlManagementFacade.updateDescription(command);
-
-		return ResponseEntity.noContent().build();
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void updateDescription(@ResolveCommand DescriptionCommand command) {
+		commandBus.execute(command);
 	}
 
 	@DeleteMapping("/{urlId}")
-	public ResponseEntity<Void> deleteUrl(@PathVariable("urlId") Long urlId, Authentication authentication) {
-
-		DeleteUrlCommand command = DeleteUrlCommandMapper.toCommand(urlId, authentication);
-		urlManagementFacade.deleteUrl(command);
-
-		return ResponseEntity.noContent().build();
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteUrl(@ResolveCommand DeleteUrlCommand command) {
+		commandBus.execute(command);
 	}
 
 	@GetMapping("/{urlId}/analytics")
-	public ResponseEntity<UrlAnalyticsResponse> getUrlAnalytics(@PathVariable("urlId") Long urlId, Authentication authentication) {
-
-		UrlAnalyticsCommand command = UrlAnalyticsCommandMapper.toCommand(urlId, authentication);
-		UrlAnalyticsResult result = urlAnalyticsFacade.getUrlAnalytics(command);
-		UrlAnalyticsResponse response = UrlAnalyticsResponse.from(result);
-
-		return ResponseEntity.ok(response);
+	public UrlAnalyticsResult getUrlAnalytics(@ResolveQuery UrlAnalyticsQuery query) {
+		return queryBus.execute(query);
 	}
 }
