@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import luti.server.application.command.legacy.DeleteUrlCommand;
+import luti.server.application.command.DeleteUrlCommand;
 import luti.server.application.handler.CommandHandler;
 import luti.server.domain.service.MyUrlService;
 

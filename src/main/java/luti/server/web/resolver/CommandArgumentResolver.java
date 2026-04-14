@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import jakarta.servlet.http.HttpServletRequest;
-import luti.server.web.mapper.AuthExtractor;
+
 import org.springframework.web.servlet.HandlerMapping;
 
 @Component

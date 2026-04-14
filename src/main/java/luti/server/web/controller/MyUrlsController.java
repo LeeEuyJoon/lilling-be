@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import luti.server.application.bus.CommandBus;
 import luti.server.application.bus.QueryBus;
-import luti.server.application.command.legacy.ClaimUrlCommand;
-import luti.server.application.command.legacy.DeleteUrlCommand;
-import luti.server.application.command.legacy.DescriptionCommand;
+import luti.server.application.command.ClaimUrlCommand;
+import luti.server.application.command.DeleteUrlCommand;
+import luti.server.application.command.DescriptionCommand;
 import luti.server.application.query.MyUrlsQuery;
 import luti.server.application.query.UrlAnalyticsQuery;
 import luti.server.application.query.VerifyUrlQuery;

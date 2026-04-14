@@ -1,9 +1,7 @@
-package luti.server.application.command.legacy;
+package luti.server.application.command;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import luti.server.application.command.ICommand;
 
 public class DescriptionCommand implements ICommand<Void> {
 

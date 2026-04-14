@@ -1,4 +1,4 @@
-package luti.server.web.mapper;
+package luti.server.web.resolver;
 
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;

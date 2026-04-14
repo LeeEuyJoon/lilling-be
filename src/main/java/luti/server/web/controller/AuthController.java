@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import luti.server.web.dto.response.AuthCheckResponse;
-import luti.server.web.mapper.AuthExtractor;
+import luti.server.web.resolver.AuthExtractor;
 
 @RestController
 @RequestMapping("/api/v1/auth")

@@ -17,7 +17,6 @@ import org.springframework.web.servlet.HandlerMapping;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
-import luti.server.web.mapper.AuthExtractor;
 
 @Component
 public class QueryArgumentResolver implements HandlerMethodArgumentResolver {

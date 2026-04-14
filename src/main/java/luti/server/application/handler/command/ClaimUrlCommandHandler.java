@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import luti.server.application.command.legacy.ClaimUrlCommand;
+import luti.server.application.command.ClaimUrlCommand;
 import luti.server.application.handler.CommandHandler;
 import luti.server.application.result.UrlVerifyResult;
 import luti.server.application.validation.UrlValidation.v2.UrlValidationChainBuilder;
