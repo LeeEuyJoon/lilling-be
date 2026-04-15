@@ -5,15 +5,27 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import luti.server.domain.service.dto.MyUrlsListInfo;
 import luti.server.domain.service.dto.RecentDailyStatisticsInfo;
 import luti.server.domain.service.dto.TagInfo;
 
 public class MyUrlsListResult {
+
+	@JsonProperty("urls")
 	private final List<MyUrlItemResult> urls;
+
+	@JsonProperty("totalElements")
 	private final Long totalElements;
+
+	@JsonProperty("totalPages")
 	private final Long totalPages;
+
+	@JsonProperty("currentPage")
 	private final Long currentPage;
+
+	@JsonProperty("pageSize")
 	private final Long pageSize;
 
 	private MyUrlsListResult(List<MyUrlItemResult> urls, Long totalElements, Long totalPages, Long currentPage,
@@ -79,13 +91,29 @@ public class MyUrlsListResult {
 	}
 
 	public static class MyUrlItemResult {
+
+		@JsonProperty("id")
 		private final Long id;
+
+		@JsonProperty("shortUrl")
 		private final String shortUrl;
+
+		@JsonProperty("originalUrl")
 		private final String originalUrl;
+
+		@JsonProperty("description")
 		private final String description;
+
+		@JsonProperty("createdAt")
 		private final LocalDateTime createdAt;
+
+		@JsonProperty("clickCount")
 		private final Long clickCount;
+
+		@JsonProperty("recentDailyStats")
 		private final List<DailyStatsSummaryResult> recentDailyStats;
+
+		@JsonProperty("tags")
 		private final List<CreateTagResult> tags;
 
 		private MyUrlItemResult(Long id, String shortUrl, String originalUrl, String description, LocalDateTime createdAt,
@@ -139,7 +167,11 @@ public class MyUrlsListResult {
 		}
 
 		public static class DailyStatsSummaryResult {
+
+			@JsonProperty("date")
 			private final LocalDate date;
+
+			@JsonProperty("clickCount")
 			private final Long clickCount;
 
 			private DailyStatsSummaryResult(LocalDate date, Long clickCount) {

@@ -1,7 +1,10 @@
 package luti.server.application.result;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ShortenUrlResult {
 
+	@JsonProperty("shortUrl")
 	private final String shortenedUrl;
 
 	private ShortenUrlResult(String shortenedUrl) {

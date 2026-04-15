@@ -2,15 +2,27 @@ package luti.server.application.result;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import luti.server.domain.enums.VerifyUrlStatus;
 import luti.server.domain.service.dto.UrlMappingInfo;
 
 public class UrlVerifyResult {
 
+	@JsonProperty("status")
 	private final VerifyUrlStatus status;
+
+	@JsonProperty("originalUrl")
 	private final String originalUrl;
+
+	@JsonProperty("shortUrl")
 	private final String shortUrl;
+
+	@JsonProperty("clickCount")
 	private final Long clickCount;
+
+	@JsonProperty("createdAt")
 	private final LocalDateTime createdAt;
 
 	private UrlVerifyResult(VerifyUrlStatus status, String originalUrl, String shortUrl, Long clickCount,
@@ -48,6 +60,11 @@ public class UrlVerifyResult {
 		return status;
 	}
 
+	@JsonProperty("valid")
+	public boolean isValid() {
+		return status == VerifyUrlStatus.OK;
+	}
+
 	public String getOriginalUrl() {
 		return originalUrl;
 	}
@@ -64,6 +81,7 @@ public class UrlVerifyResult {
 		return createdAt;
 	}
 
+	@JsonIgnore
 	public boolean isOk() {
 		return status == VerifyUrlStatus.OK;
 	}

@@ -1,12 +1,11 @@
 package luti.server.web.controller;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import luti.server.web.dto.response.AuthCheckResponse;
+import luti.server.web.dto.AuthCheckResponse;
 import luti.server.web.resolver.AuthExtractor;
 
 @RestController
@@ -14,10 +13,10 @@ import luti.server.web.resolver.AuthExtractor;
 public class AuthController {
 
 	@GetMapping("/me")
-	public ResponseEntity<AuthCheckResponse> isAuthenticated(Authentication authentication) {
-		Boolean isAuthenticated = AuthExtractor.isAuthenticated(authentication);
-		AuthCheckResponse response = AuthCheckResponse.of(isAuthenticated);
+	public AuthCheckResponse isAuthenticated(Authentication authentication) {
+		boolean isAuthenticated = AuthExtractor.isAuthenticated(authentication);
+		Long memberId = AuthExtractor.extractMemberId(authentication);
 
-		return ResponseEntity.ok(response);
+		return AuthCheckResponse.of(isAuthenticated, memberId, null);
 	}
 }

@@ -1,9 +1,14 @@
 package luti.server.application.result;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import luti.server.domain.service.dto.TagInfo;
 
 public class CreateTagResult {
+	@JsonProperty("id")
 	private final Long id;
+
+	@JsonProperty("name")
 	private final String name;
 
 	private CreateTagResult(Long id, String name) {

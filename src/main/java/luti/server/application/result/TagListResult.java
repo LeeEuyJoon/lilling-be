@@ -2,10 +2,13 @@ package luti.server.application.result;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import luti.server.domain.service.dto.TagInfo;
 
 public class TagListResult {
 
+	@JsonProperty("tags")
 	private final List<CreateTagResult> tags;
 
 	private TagListResult(List<CreateTagResult> tags) {
