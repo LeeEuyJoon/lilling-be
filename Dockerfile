@@ -10,14 +10,17 @@ COPY gradle gradle
 COPY build.gradle .
 COPY settings.gradle .
 
+# Give execute permission to Gradle wrapper
+RUN chmod +x gradlew
+
 # Download dependencies (cached layer)
-RUN gradle dependencies --no-daemon || true
+RUN ./gradlew dependencies --no-daemon || true
 
 # Copy source code
 COPY src src
 
 # Build the application (skip tests for faster build)
-RUN gradle clean build -x test --no-daemon
+RUN ./gradlew clean build -x test --no-daemon
 
 # Stage 2: Runtime
 FROM amazoncorretto:17-alpine

@@ -5,6 +5,10 @@ spring:
   application:
     name: lilling
 
+  jackson:
+    deserialization:
+      accept-single-value-as-array: true
+
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}

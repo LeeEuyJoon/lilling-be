@@ -112,7 +112,9 @@ class DeleteUrlIntegrationTest {
 
 		// When: URL 삭제
 		mockMvc.perform(delete("/api/v1/my-urls/" + urlId)
-				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString())))
+				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString()))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{}"))
 			.andExpect(status().isNoContent());
 
 		// Then: DB에서 soft delete 확인 (count는 유지, isDeleted=true, deletedAt 설정)
@@ -141,7 +143,9 @@ class DeleteUrlIntegrationTest {
 
 		// When & Then: 존재하지 않는 URL 삭제 시도
 		mockMvc.perform(delete("/api/v1/my-urls/" + nonExistentUrlId)
-				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString())))
+				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString()))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{}"))
 			.andExpect(status().isNotFound());
 
 		System.out.println("예외 발생: 404 NOT_FOUND");
@@ -174,7 +178,9 @@ class DeleteUrlIntegrationTest {
 
 		// When & Then: 다른 Member가 삭제 시도
 		mockMvc.perform(delete("/api/v1/my-urls/" + urlId)
-				.with(SecurityMockMvcRequestPostProcessors.user(savedOtherMember.getId().toString())))
+				.with(SecurityMockMvcRequestPostProcessors.user(savedOtherMember.getId().toString()))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{}"))
 			.andExpect(status().isForbidden());
 
 		// Then: URL은 여전히 존재하고 삭제되지 않음
@@ -206,7 +212,9 @@ class DeleteUrlIntegrationTest {
 		System.out.println("URL ID: " + urlId);
 
 		// When & Then: 인증 없이 삭제 시도
-		mockMvc.perform(delete("/api/v1/my-urls/" + urlId))
+		mockMvc.perform(delete("/api/v1/my-urls/" + urlId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{}"))
 			.andExpect(status().isUnauthorized());
 
 		// Then: URL은 여전히 존재하고 삭제되지 않음
@@ -243,7 +251,9 @@ class DeleteUrlIntegrationTest {
 		// Note: 현재 production 코드는 member가 null일 때 NullPointerException 발생
 		// GlobalExceptionHandler에서 catch되어 400 BAD_REQUEST 반환
 		mockMvc.perform(delete("/api/v1/my-urls/" + urlId)
-				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString())))
+				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString()))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{}"))
 			.andExpect(status().isBadRequest());
 
 		// Then: URL은 여전히 존재하고 삭제되지 않음
@@ -281,7 +291,9 @@ class DeleteUrlIntegrationTest {
 
 		// When: 두 번째 URL 삭제
 		mockMvc.perform(delete("/api/v1/my-urls/" + urlIdToDelete)
-				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString())))
+				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString()))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{}"))
 			.andExpect(status().isNoContent());
 
 		// Then: soft delete로 3개 모두 존재하지만, 1개는 isDeleted=true
@@ -322,7 +334,9 @@ class DeleteUrlIntegrationTest {
 
 		// When & Then: PathVariable이 제대로 바인딩되어 삭제됨
 		mockMvc.perform(delete("/api/v1/my-urls/" + urlId)
-				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString())))
+				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString()))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{}"))
 			.andExpect(status().isNoContent());
 
 		// Then: soft delete 확인
@@ -347,7 +361,9 @@ class DeleteUrlIntegrationTest {
 
 		// When & Then: 잘못된 ID 형식으로 요청
 		mockMvc.perform(delete("/api/v1/my-urls/" + invalidUrlId)
-				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString())))
+				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString()))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{}"))
 			.andExpect(status().isBadRequest());
 
 		System.out.println("예외 발생: 400 BAD_REQUEST");
@@ -376,7 +392,9 @@ class DeleteUrlIntegrationTest {
 
 		// When: URL 삭제
 		mockMvc.perform(delete("/api/v1/my-urls/" + urlIdToDelete)
-				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString())))
+				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString()))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{}"))
 			.andExpect(status().isNoContent());
 
 		System.out.println("URL 삭제 완료");
@@ -408,7 +426,9 @@ class DeleteUrlIntegrationTest {
 
 		// When & Then: 음수 ID로 삭제 시도
 		mockMvc.perform(delete("/api/v1/my-urls/" + negativeUrlId)
-				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString())))
+				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString()))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{}"))
 			.andExpect(status().isNotFound());
 
 		System.out.println("예외 발생: 404 NOT_FOUND");
@@ -428,7 +448,9 @@ class DeleteUrlIntegrationTest {
 
 		// When & Then: 0번 ID로 삭제 시도
 		mockMvc.perform(delete("/api/v1/my-urls/" + zeroUrlId)
-				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString())))
+				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString()))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{}"))
 			.andExpect(status().isNotFound());
 
 		System.out.println("예외 발생: 404 NOT_FOUND");
@@ -455,7 +477,9 @@ class DeleteUrlIntegrationTest {
 
 		// When: 첫 번째 삭제 (성공)
 		mockMvc.perform(delete("/api/v1/my-urls/" + urlId)
-				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString())))
+				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString()))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{}"))
 			.andExpect(status().isNoContent());
 
 		UrlMapping firstDelete = urlMappingRepository.findById(urlId).orElseThrow();
@@ -464,7 +488,9 @@ class DeleteUrlIntegrationTest {
 
 		// Then: 두 번째 삭제 시도 (성공 - soft delete는 중복 가능)
 		mockMvc.perform(delete("/api/v1/my-urls/" + urlId)
-				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString())))
+				.with(SecurityMockMvcRequestPostProcessors.user(savedMember.getId().toString()))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{}"))
 			.andExpect(status().isNoContent());
 
 		UrlMapping secondDelete = urlMappingRepository.findById(urlId).orElseThrow();
