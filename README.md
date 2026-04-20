@@ -109,4 +109,5 @@ Little Linking의 의미를 담고 있는 Lilling은 URL Shortener 웹 서비스
 📝 **관련 작성 글**
 
 - [고유하면서도 랜덤한 7자리 인코딩을 찾아가는 여정 (Base62, 선형식, XORShift, Feistel Cipher)](https://luti-dev.tistory.com/21)
-- [Spring Boot 로깅의 표준 Logback과 SLF4J 알아보기](https://luti-dev.tistory.com/23)
+- [극단적으로 클린한 Presentation Layer 설계 | Command Bus & HandlerMethodArgumentResolver](https://luti-dev.tistory.com/28)
+
