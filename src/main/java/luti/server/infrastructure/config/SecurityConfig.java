@@ -31,7 +31,8 @@ public class SecurityConfig {
 	@Bean
 	public BearerTokenResolver bearerTokenResolver() {
 		return request -> {
-			if (request.getRequestURI().startsWith("/api/v1/auth/")) {
+			String uri = request.getRequestURI();
+			if (uri.equals("/api/v1/auth/refresh") || uri.equals("/api/v1/auth/logout")) {
 				return null;
 			}
 			Cookie[] cookies = request.getCookies();
