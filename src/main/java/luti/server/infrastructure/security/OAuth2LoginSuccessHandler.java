@@ -23,6 +23,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
 	private final JwtProvider jwtProvider;
 	private final OAuth2MemberProvisioner oAuth2MemberProvisioner;
+	private final RefreshTokenStore refreshTokenStore;
 
 	@Value("${app.frontend.redirect-url:http://localhost:3000/}")
 	private String redirectUrl;
@@ -36,12 +37,11 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 	@Value("${app.cookie.same-site:Lax}")
 	private String cookieSameSite; // 운영 cross-site면 None 권장
 
-	@Value("${JWT_ACCESS_TTL_SECONDS:3600}")
-	private long accessTtlSeconds;
-
-	public OAuth2LoginSuccessHandler(JwtProvider jwtProvider, OAuth2MemberProvisioner oAuth2MemberProvisioner) {
+	public OAuth2LoginSuccessHandler(JwtProvider jwtProvider, OAuth2MemberProvisioner oAuth2MemberProvisioner,
+									 RefreshTokenStore refreshTokenStore) {
 		this.jwtProvider = jwtProvider;
 		this.oAuth2MemberProvisioner = oAuth2MemberProvisioner;
+		this.refreshTokenStore = refreshTokenStore;
 	}
 
 	@Override
@@ -70,32 +70,37 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 			return;
 		}
 
-		// DB에서 Member 확보
 		ProvisionedMemberDto pm = oAuth2MemberProvisioner.findOrCreate(Provider.GOOGLE, sub, email);
 
-		// Access JWT 발급 (sub = memberId)
 		String accessToken = jwtProvider.issueAccessToken(
 			pm.getMemberId().toString(),
 			List.of(pm.getRole().name())
 		);
 
-		// 쿠키 세팅
-		ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from("access_token", accessToken)
-																	 .httpOnly(true)
-																	 .secure(cookieSecure)
-																	 .path("/")
-																	 .maxAge(accessTtlSeconds)
-																	 .sameSite(cookieSameSite);
+		String refreshToken = jwtProvider.issueRefreshToken(pm.getMemberId().toString());
+		String refreshJti = jwtProvider.extractJti(refreshToken);
+		refreshTokenStore.save(refreshJti, pm.getMemberId().toString(), jwtProvider.getRefreshTtlSeconds());
 
-		// Domain은 로컬에선 비우고, 운영에서만 ".lill.ing"
+		response.addHeader(HttpHeaders.SET_COOKIE,
+						   buildCookie("access_token", accessToken, jwtProvider.getAccessTtlSeconds()).toString());
+		response.addHeader(HttpHeaders.SET_COOKIE,
+						   buildCookie("refresh_token", refreshToken, jwtProvider.getRefreshTtlSeconds()).toString());
+
+		response.sendRedirect(redirectUrl);
+	}
+
+	private ResponseCookie buildCookie(String name, String value, long maxAge) {
+		ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from(name, value)
+			.httpOnly(true)
+			.secure(cookieSecure)
+			.path("/")
+			.maxAge(maxAge)
+			.sameSite(cookieSameSite);
+
 		if (cookieDomain != null && !cookieDomain.isBlank()) {
 			builder.domain(cookieDomain);
 		}
 
-		ResponseCookie cookie = builder.build();
-		response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
-		// 프론트로 redirect
-		response.sendRedirect(redirectUrl);
+		return builder.build();
 	}
 }

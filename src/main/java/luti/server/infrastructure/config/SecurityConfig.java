@@ -30,20 +30,19 @@ public class SecurityConfig {
 
 	@Bean
 	public BearerTokenResolver bearerTokenResolver() {
-		return new BearerTokenResolver() {
-			@Override
-			public String resolve(HttpServletRequest request) {
-				Cookie[] cookies = request.getCookies();
-				if (cookies == null) return null;
-
-				for (Cookie c : cookies) {
-					if ("access_token".equals(c.getName())) {
-						String v = c.getValue();
-						return (v == null || v.isBlank()) ? null : v;
-					}
-				}
+		return request -> {
+			if (request.getRequestURI().startsWith("/api/v1/auth/")) {
 				return null;
 			}
+			Cookie[] cookies = request.getCookies();
+			if (cookies == null) return null;
+			for (Cookie cookie: cookies) {
+				if ("access_token".equals(cookie.getName())) {
+					String v = cookie.getValue();
+					return (v == null || v.isBlank()) ? null : v;
+				}
+			}
+			return null;
 		};
 	}
 
