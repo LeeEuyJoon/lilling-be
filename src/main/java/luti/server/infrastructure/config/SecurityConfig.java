@@ -94,13 +94,15 @@ public class SecurityConfig {
 				.jwt(Customizer.withDefaults())
 			);
 
-		// 인가 룰 - 기본은 모두 허용, My URLs 관련만 인증 필요
+		// 인가 룰
 		http
 			.authorizeHttpRequests(auth -> auth
 				// My URLs 관련 -> 인증 필요
 				.requestMatchers("/api/v1/my-urls/**").authenticated()
 				// 태그 관련 -> 인증 필요
 				.requestMatchers("/api/v1/tags/**").authenticated()
+				// /me -> 인증 필요 (401로 apiFetch의 refreshPromise 경로 타도록)
+				.requestMatchers("/api/v1/auth/me").authenticated()
 
 				.anyRequest().permitAll()
 			);
