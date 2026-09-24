@@ -32,9 +32,10 @@ public class RedirectQueryHandler implements QueryHandler<RedirectQuery, Redirec
 		log.info("리다이렉트 요청: shortCode={}", query.getShortCode());
 
 		Long decodedId = base62Encoder.decode(query.getShortCode());
-		clickCountService.recordClick(decodedId); // async
 
 		String originalUrl = urlQueryService.getOriginalUrl(decodedId);
+		clickCountService.recordClick(decodedId); // async
+
 		RedirectResult result = RedirectResult.of(originalUrl);
 
 		return result;
