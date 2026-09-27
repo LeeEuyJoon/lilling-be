@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -18,6 +19,13 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<Void> handleNoResourceFoundException(NoResourceFoundException ex, WebRequest request) {
 		log.debug("정적 리소스 요청 (봇 스캔 등 예상된 404): uri={}", request.getDescription(false));
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	}
+
+	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+	public ResponseEntity<Void> handleMethodNotSupportedException(HttpRequestMethodNotSupportedException ex, WebRequest
+			request) {
+		log.debug("지원하지 않는 메서드 요청 (봇 스캔 등 예상된 405): uri={}", request.getDescription(false));
+		return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
 	}
 
 	@ExceptionHandler(Exception.class)
