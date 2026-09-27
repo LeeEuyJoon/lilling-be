@@ -26,6 +26,9 @@ RUN ./gradlew clean build -x test --no-daemon
 FROM amazoncorretto:17-alpine
 WORKDIR /app
 
+# Download OpenTelemetry Java agent
+RUN wget -O otel-agent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar
+
 # Copy the built JAR from build stage
 COPY --from=build /app/build/libs/*.jar app.jar
 
@@ -33,4 +36,4 @@ COPY --from=build /app/build/libs/*.jar app.jar
 EXPOSE 8080
 
 # Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-javaagent:/app/otel-agent.jar", "-jar", "app.jar"]
