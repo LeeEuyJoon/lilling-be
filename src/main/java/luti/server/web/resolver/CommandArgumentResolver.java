@@ -47,7 +47,7 @@ public class CommandArgumentResolver implements HandlerMethodArgumentResolver {
 
 		// JSON body 파싱
 		JsonNode jsonNode = objectMapper.readTree(request.getInputStream());
-		if (jsonNode == null) {
+		if (jsonNode == null || jsonNode.isMissingNode()) {
 			jsonNode = objectMapper.createObjectNode();
 		}
 
